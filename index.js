@@ -17,6 +17,15 @@ const phrases = [
   'Вы и щас красавчики братва',
   'Дай газу, братец',
   'После текилы голова говяжья',
+  'Корректировку на пивко внесли',
+  'Щас пиву дадим понедельник день тяжелый',
+  'Андрей Минаев',
+ 'Египетская сила может тоже дать сегодня',
+ 'Секс',
+ 'Вери гуд',
+ 'Джабки особенной вырублю. Ебать ахуеем',
+ 'напротив замка пиво сидел пил в пятницу',
+ 'ОПА в пятницу тоже бухать пойду',
   'Да тяжко',
   'Не ну',
   'Пивасиком разравняться',
@@ -71,13 +80,14 @@ bot.on('message', (msg) => {
   }
   
 
-  if (Math.random() < 0.05) {
-    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-
-    // С вероятностью 50% ответить прямо на сообщение, иначе просто отправить в чат
-    if (Math.random() < 0.5) {
-      bot.sendMessage(chatId, randomPhrase, { reply_to_message_id: msg.message_id });
+  // С вероятностью 5% отвечаем
+  if (Math.random() < 0.08) {
+    // С вероятностью 20% отправляем стикер вместо текста
+    if (Math.random() < 0.2) {
+      const randomSticker = stickerIds[Math.floor(Math.random() * stickerIds.length)];
+      bot.sendSticker(chatId, randomSticker);
     } else {
+      const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
       bot.sendMessage(chatId, randomPhrase);
     }
   }
@@ -115,3 +125,15 @@ cron.schedule('*/20 * * * *', () => {
 cron.schedule('0 22 * * *', () => {
   bot.sendMessage(CHANNEL_CHAT_ID, 'Спать пора мужики');
 });
+
+// file_id стикера для отправки
+const stickerIds = [
+  'CAACAgIAAx0CZ5pVEwABCxYGaHaf8E8XAAHKIvFhQAaxt6BK0J9OAAKCAAPHwsIgyP97roQJ6W42BA',
+  'CAACAgIAAx0CZ5pVEwABCxYIaHagSuWH8X0JFUTyZRQdEjmmGbAAAlMAA8fCwiDYYvwqMZKy1zYE',
+  'CAACAgIAAxkBAAN-aHafo8ofwR5wz0SPOncnioGzt4gAAv1RAALITHFKuuMcV_EejH82BA',
+  'CAACAgIAAx0CZ5pVEwABCxYLaHagiRak11JEiKYlFPxd77IiOf4AAg0XAAKS9vBJ9xaUt_eoMbE2BA',
+  'CAACAgQAAx0CZ5pVEwABCxYMaHagl0tlUTOYj1YnSyzLNHlRZH8AAlEPAAKm8XEedZ60Jhfak4Y2BA',
+  'CAACAgIAAx0CZ5pVEwABCxYNaHagpPTPyZgWZv4Uv7k-NH3Jn_4AAgxzAAKCXilJn_2bl3zaByI2BA',
+  'CAACAgIAAx0CZ5pVEwABCxYOaHags4PC08Oi6ymOgCpdxDIYLEMAAtU8AAIvL0BJuqeOrjC2PSM2BA',
+  'CAACAgIAAx0CZ5pVEwABCxYPaHagvLy5H7GcvzBwhx4IaBspmrYAAn9OAAKA64FJMSMTsTA7pY82BA'
+];
