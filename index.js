@@ -30,3 +30,9 @@ bot.on('message', (msg) => {
   const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
   bot.sendMessage(chatId, randomPhrase);
 });
+
+bot.on('channel_post', (msg) => {
+  const chatId = msg.chat.id;
+  const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+  bot.sendMessage(chatId, randomPhrase);
+});
