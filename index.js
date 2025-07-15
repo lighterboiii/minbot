@@ -11,6 +11,7 @@ const phrases = [
   'Что ты вообще несёшь?',
   'Ты в своём уме?',
   'Мескаликом еще закрепил',
+  'Дай газу, братец',
   'После текилы голова говяжья',
   'Да тяжко',
   'Не ну',
@@ -38,19 +39,26 @@ const phrases = [
 
 // Ответ на команды типа /start
 bot.onText(/\/start/, (msg) => {
-  bot.sendMessage(msg.chat.id, 'Привет, я Минбот. Спро́си меня что-нибудь!');
+  bot.sendMessage(msg.chat.id, 'Привет, я Минчик!');
 });
 
 // Ответ на любое текстовое сообщение
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   console.log(msg);
+
   // Игнорировать команды, кроме /start
   if (msg.text.startsWith('/')) return;
 
   if (Math.random() < 0.05) {
     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-    bot.sendMessage(chatId, randomPhrase);
+
+    // С вероятностью 50% ответить прямо на сообщение, иначе просто отправить в чат
+    if (Math.random() < 0.5) {
+      bot.sendMessage(chatId, randomPhrase, { reply_to_message_id: msg.message_id });
+    } else {
+      bot.sendMessage(chatId, randomPhrase);
+    }
   }
 });
 
