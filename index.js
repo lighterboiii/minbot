@@ -33,9 +33,17 @@ const phrases = [
   'Пошел димасик нахуй',
   'Долбаеб',
   'Может из тебя коклеты посыпятся борзенков',
-  'Обедать будем'
+  'Обедать будем',
+  'Дирябчик',
 ];
 
+let botId = null;
+
+// Получаем ID бота после старта
+bot.getMe().then(me => {
+  botId = me.id;
+  console.log('Bot ID:', botId);
+});
 
 // Ответ на команды типа /start
 bot.onText(/\/start/, (msg) => {
@@ -48,7 +56,16 @@ bot.on('message', (msg) => {
   console.log(msg);
 
   // Игнорировать команды, кроме /start
-  if (msg.text.startsWith('/')) return;
+  if (msg.text && msg.text.startsWith('/') && !msg.text.startsWith('/start')) return;
+
+  // Реагируем на ответы на сообщения бота
+  if (msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
+    const userText = msg.text || '';
+    const answer = `братик что такое "${userText}"`;
+    bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    return;
+  }
+  
 
   if (Math.random() < 0.05) {
     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
