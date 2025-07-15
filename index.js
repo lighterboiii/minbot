@@ -11,6 +11,10 @@ const phrases = [
   'Что ты вообще несёшь?',
   'Ты в своём уме?',
   'Мескаликом еще закрепил',
+  'Что да да Минай',
+  'Предлагаю Диману смачно пойти нахуй',
+  'Че распизделись друганы',
+  'Вы и щас красавчики братва',
   'Дай газу, братец',
   'После текилы голова говяжья',
   'Да тяжко',
@@ -92,4 +96,22 @@ const CHANNEL_CHAT_ID = process.env.CHANNEL_CHAT_ID || 'YOUR_CHANNEL_CHAT_ID';
 // Каждый день в 8:00 утра по серверному времени
 cron.schedule('0 8 * * *', () => {
   bot.sendMessage(CHANNEL_CHAT_ID, 'Здарова, Мужики');
+});
+
+const periodicPhrases = [
+  'Че притихли братульцы?',
+  'Але амигосы',
+  'Мучачес',
+  'Мескалика бы ща'
+];
+
+// Каждые 20 минут
+cron.schedule('*/20 * * * *', () => {
+  const randomPhrase = periodicPhrases[Math.floor(Math.random() * periodicPhrases.length)];
+  bot.sendMessage(CHANNEL_CHAT_ID, randomPhrase);
+});
+
+// Каждый день в 22:00
+cron.schedule('0 22 * * *', () => {
+  bot.sendMessage(CHANNEL_CHAT_ID, 'Спать пора мужики');
 });
