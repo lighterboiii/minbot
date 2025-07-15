@@ -1,5 +1,6 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
+const cron = require('node-cron');
 
 // Вставь сюда свой токен от BotFather
 const token = process.env.BOT_TOKEN;
@@ -43,19 +44,27 @@ bot.onText(/\/start/, (msg) => {
 // Ответ на любое текстовое сообщение
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-
+  console.log(msg);
   // Игнорировать команды, кроме /start
   if (msg.text.startsWith('/')) return;
 
-  const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-  bot.sendMessage(chatId, randomPhrase);
+  if (Math.random() < 0.05) {
+    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+    bot.sendMessage(chatId, randomPhrase);
+  }
 });
 
 bot.on('channel_post', (msg) => {
   const chatId = msg.chat.id;
-  // С вероятностью 30% отправляем сообщение
   if (Math.random() < 0.034) {
     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
     bot.sendMessage(chatId, randomPhrase);
   }
+});
+
+const CHANNEL_CHAT_ID = process.env.CHANNEL_CHAT_ID || 'YOUR_CHANNEL_CHAT_ID';
+
+// Каждый день в 8:00 утра по серверному времени
+cron.schedule('0 8 * * *', () => {
+  bot.sendMessage(CHANNEL_CHAT_ID, 'Здарова, Мужики');
 });
