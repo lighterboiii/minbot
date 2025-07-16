@@ -68,13 +68,13 @@ bot.on('message', (msg) => {
   if (!handled && msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
     if (msg.text) {
       const userText = msg.text;
-      const answer = `Братик "${userText}" не знаю. Может лучше разравняемся?`;
+      const answer = `Братик ${userText} не знаю. Может лучше разравняемся?`;
       bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
     } else if (msg.sticker) {
       const answer = `Братик, ты мне стикер кидаешь? Может лучше разравняемся?`;
       bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
     }
-    // handled = true;
+    handled = true;
     return;
   }
 
