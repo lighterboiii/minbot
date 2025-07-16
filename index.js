@@ -6,6 +6,8 @@ const RSSParser = require("rss-parser");
 const rssParser = new RSSParser();
 const fs = require('fs');
 const PHOTOS_FILE = 'photos.json';
+const USERS_OF_DAY_FILE = 'usersOfDay.json';
+const insultsOfDay = require('./insultsOfDay');
 
 const token = process.env.BOT_TOKEN;
 
@@ -115,6 +117,9 @@ bot.on("message", (msg) => {
   if (Math.random() < 0.14) {
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
     bot.sendMessage(msg.chat.id, randomEmoji, { reply_to_message_id: msg.message_id });
+  }
+  if (msg.from && msg.from.id) {
+    saveUserOfDay(msg.from);
   }
 });
 // для каналов
@@ -348,6 +353,34 @@ bot.onText(/\/photo/, (msg) => {
   const fileId = arr[Math.floor(Math.random() * arr.length)];
   const caption = photoCaptions[Math.floor(Math.random() * photoCaptions.length)];
   bot.sendPhoto(msg.chat.id, fileId, { caption });
+});
+
+function saveUserOfDay(user) {
+  let arr = [];
+  if (fs.existsSync(USERS_OF_DAY_FILE)) {
+    try { arr = JSON.parse(fs.readFileSync(USERS_OF_DAY_FILE, 'utf8')); } catch {}
+  }
+  if (!arr.some(u => u.id === user.id)) {
+    arr.push({ id: user.id, username: user.username || '', first_name: user.first_name || '' });
+    fs.writeFileSync(USERS_OF_DAY_FILE, JSON.stringify(arr));
+  }
+}
+
+function sendBratDnya() {
+  if (!fs.existsSync(USERS_OF_DAY_FILE)) return;
+  let arr = [];
+  try { arr = JSON.parse(fs.readFileSync(USERS_OF_DAY_FILE, 'utf8')); } catch {}
+  if (!arr.length) return;
+  const user = arr[Math.floor(Math.random() * arr.length)];
+  const insult = insultsOfDay[Math.floor(Math.random() * insultsOfDay.length)];
+  const mention = user.username ? `@${user.username}` : user.first_name || 'братец';
+  const text = `Сегодня ${insult} дня — ${mention}! Поздравляем, братик! Иди ка нахуй теперь давай поскорее.`;
+  bot.sendMessage(CHANNEL_CHAT_ID, text);
+}
+
+cron.schedule('0 13 * * *', sendBratDnya);
+bot.onText(/\/bratdnya/, (msg) => {
+  sendBratDnya();
 });
 
 
