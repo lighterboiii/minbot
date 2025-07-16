@@ -6,7 +6,6 @@ const RSSParser = require("rss-parser");
 const rssParser = new RSSParser();
 const fs = require('fs');
 const PHOTOS_FILE = 'photos.json';
-const STICKERS_JSON = 'stickers.json';
 
 const token = process.env.BOT_TOKEN;
 
@@ -21,7 +20,7 @@ const emojis = require('./emojis');
 const insults = require('./insults');
 
 const SLAVA_ID = 653015244;
-const slavaTriggers = ["слава", "славик"];
+const slavaTriggers = ["слава", "славик", "Слава", "Славой", "Славу", "Славе", "О славе", "славой"];
 
 let botId = null;
 let botUsername = null;
