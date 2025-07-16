@@ -104,8 +104,8 @@ bot.on("message", (msg) => {
 /news — пришлю подборку свежих новостей
 /photo — пришлю случайную фотку из чата и че нить скажу
 /bratdnya — выберу "брата дня"
-/check_pivko — выберу, кто угощает пивком
-/check_mescal — выберу, кто угощает мескаликом
+/pivko — выберу, кто угощает пивком
+/mezcal — выберу, кто угощает мескаликом
 /photo – отправлю фотку из чата с комментарием`;
     bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
   }
@@ -140,8 +140,7 @@ bot.on("message", (msg) => {
     }
   }
 
-  // Отправляем эмодзи-реакцию
-  if (Math.random() < 0.07) {
+  if (Math.random() < 0.02) {
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
     bot.sendMessage(msg.chat.id, randomEmoji, {
       reply_to_message_id: msg.message_id,
@@ -435,7 +434,7 @@ bot.onText(/\/bratdnya/, (msg) => {
   sendBratDnya();
 });
 
-bot.onText(/\/check_pivko/, (msg) => {
+bot.onText(/\/pivko/, (msg) => {
   if (!fs.existsSync(USERS_OF_DAY_FILE)) return;
   let arr = [];
   try {
@@ -446,11 +445,11 @@ bot.onText(/\/check_pivko/, (msg) => {
   const mention = user.username
     ? `@${user.username}`
     : user.first_name || "братец";
-  const text = `Чек на пивко: ${mention}, сегодня твоя очередь угощать!`;
+  const text = `Чек на пивко сегодня за ${mention}, сегодня твоя очередь угощать!`;
   bot.sendMessage(msg.chat.id, text);
 });
 
-bot.onText(/\/check_mescal/, (msg) => {
+bot.onText(/\/mescal/, (msg) => {
   if (!fs.existsSync(USERS_OF_DAY_FILE)) return;
   let arr = [];
   try {
@@ -461,6 +460,6 @@ bot.onText(/\/check_mescal/, (msg) => {
   const mention = user.username
     ? `@${user.username}`
     : user.first_name || "братец";
-  const text = `Чек на мескалик: ${mention}, сегодня твоя очередь угощать!`;
+  const text = `Чек на мескалик сегодня за ${mention}, сегодня твоя очередь угощать!`;
   bot.sendMessage(msg.chat.id, text);
 });
