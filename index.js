@@ -9,6 +9,7 @@ const PHOTOS_FILE = "photos.json";
 const USERS_OF_DAY_FILE = "usersOfDay.json";
 const insultsOfDay = require("./insultsOfDay");
 const BRATDNYA_FILE = 'bratdnya.json';
+const { initRoulette } = require('./roulette');
 
 const token = process.env.BOT_TOKEN;
 
@@ -56,8 +57,8 @@ bot.onText(/\/start/, (msg) => {
 
 /photo — пришлю случайную фотку из чата
 /bratdnya — выберу "брата дня"
-/check_pivko — выберу, кто угощает пивком
-/check_mescal — выберу, кто угощает мескаликом
+/pivko — выберу, кто угощает пивком
+/mescal — выберу, кто угощает мескаликом
 /photo – отправлю фотку из чата с комментарием
 
 Также я иногда сам пишу в чат, отправляю фотки, новости, создаю опросы и эмодзи!`
@@ -65,87 +66,84 @@ bot.onText(/\/start/, (msg) => {
 });
 
 // Ответ на любое текстовое сообщение
-bot.on("message", (msg) => {
+bot.on('message', (msg) => {
   const chatId = msg.chat.id;
+  let handled = false;
   const lowerCaseText = (msg.text || "").toLowerCase();
 
-  // Реакция на Славу
-  if (
-    msg.from.id === SLAVA_ID &&
-    slavaTriggers.some((trigger) => lowerCaseText.includes(trigger))
-  ) {
+  // Персональная реакция на Славу
+  if (!handled && msg.from.id === SLAVA_ID && slavaTriggers.some(trigger => lowerCaseText.includes(trigger))) {
     const randomInsult = insults[Math.floor(Math.random() * insults.length)];
-    bot.sendMessage(chatId, randomInsult, {
-      reply_to_message_id: msg.message_id,
-    });
+    bot.sendMessage(chatId, randomInsult, { reply_to_message_id: msg.message_id });
+    handled = true;
     return;
   }
 
+  // Участие в рулетке (handled внутри roulette.js)
+  // ... (roulette.js сам обрабатывает и не вызывает return здесь)
+
   // Сохраняем file_id самой большой фотки
-  if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
+  if (!handled && msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
     const largest = msg.photo[msg.photo.length - 1];
     savePhotoId(largest.file_id);
   }
 
-  // Реакция на упоминание бота через @username (дополнительно, не return)
-  if (
-    msg.text &&
-    botUsername &&
-    msg.text.toLowerCase().includes("@" + botUsername.toLowerCase())
-  ) {
-    let userText = msg.text
-      .replace(new RegExp("@" + botUsername, "ig"), "")
-      .trim();
-    const answer = `Сам ты ${userText} братик
-    
-Я вот что могу:
+  // Сохраняем file_id стикеров
+  if (!handled && msg.sticker) {
+    saveStickerId(msg.sticker.file_id);
+  }
 
-/weather — покажу погоду
-/news — пришлю подборку свежих новостей
-/photo — пришлю случайную фотку из чата и че нить скажу
-/bratdnya — выберу "брата дня"
-/pivko — выберу, кто угощает пивком
-/mezcal — выберу, кто угощает мескаликом
-/photo – отправлю фотку из чата с комментарием`;
+  // Реакция на упоминание бота через @username
+  if (!handled && msg.text && botUsername && msg.text.toLowerCase().includes("@" + botUsername.toLowerCase())) {
+    let userText = msg.text.replace(new RegExp("@" + botUsername, "ig"), "").trim();
+    const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/photo — пришлю случайную фотку из чата и че нить скажу\n/bratdnya — выберу \"брата дня\"\n/check_pivko — выберу, кто угощает пивком\n/check_mescal — выберу, кто угощает мескаликом\n/photo – отправлю фотку из чата с комментарием`;
     bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    handled = true;
+    return;
   }
 
   // Игнорировать команды, кроме /start
-  if (msg.text && msg.text.startsWith("/") && !msg.text.startsWith("/start"))
-    return;
-
-  // Реагируем на ответы на сообщения бота
-  if (msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
-    if (msg.text) {
-      const userText = msg.text;
-      const answer = `Братик ${userText} не знаю. Может лучше разравняемся?`;
-      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
-    } else if (msg.sticker) {
-      const answer = `Братик, ты мне стикер отправил? Может лучше деньги Славе скинешь на пивко?`;
-      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
-    }
+  if (!handled && msg.text && msg.text.startsWith("/") && !msg.text.startsWith("/start")) {
+    handled = true;
     return;
   }
 
-  // С вероятностью 5% отвечаем
-  if (Math.random() < 0.08) {
-    // С вероятностью 20% отправляем стикер вместо текста
+  // Реагируем на ответы на сообщения бота
+  if (!handled && msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
+    if (msg.text) {
+      const userText = msg.text;
+      const answer = `Братик \"${userText}\" не знаю. Может лучше разравняемся?`;
+      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    } else if (msg.sticker) {
+      const answer = `Братик, ты мне стикер кидаешь? Может лучше разравняемся?`;
+      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    }
+    handled = true;
+    return;
+  }
+
+  // С вероятностью 3% отправляем эмодзи-реакцию
+  if (!handled && Math.random() < 0.03) {
+    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    bot.sendMessage(msg.chat.id, randomEmoji, { reply_to_message_id: msg.message_id });
+    handled = true;
+    return;
+  }
+
+  // С вероятностью 8% отвечаем фразой или стикером
+  if (!handled && Math.random() < 0.08) {
     if (Math.random() < 0.2) {
-      const randomSticker =
-        stickerIds[Math.floor(Math.random() * stickerIds.length)];
+      const randomSticker = stickerIds[Math.floor(Math.random() * stickerIds.length)];
       bot.sendSticker(chatId, randomSticker);
     } else {
       const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
       bot.sendMessage(chatId, randomPhrase);
     }
+    handled = true;
+    return;
   }
 
-  if (Math.random() < 0.02) {
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    bot.sendMessage(msg.chat.id, randomEmoji, {
-      reply_to_message_id: msg.message_id,
-    });
-  }
+  // Сохраняем пользователя для братдня
   if (msg.from && msg.from.id) {
     saveUserOfDay(msg.from);
   }
@@ -463,3 +461,5 @@ bot.onText(/\/mescal/, (msg) => {
   const text = `Чек на мескалик сегодня за ${mention}, сегодня твоя очередь угощать!`;
   bot.sendMessage(msg.chat.id, text);
 });
+
+initRoulette(bot);
