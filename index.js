@@ -15,18 +15,19 @@ const phrases = [
   "Мескаликом еще закрепил",
   "Что да да Минай",
   "Предлагаю Диману смачно пойти нахуй",
-  'Видел где то его, поговаривают что он долбаеб диман вроде говорил Борзенков',
-  'Блять Дима Борзенков!',
-  'Ща еще метро там уебут',
-  'Я метро зашел там мужик уже с Девяткино с пивом едет',
-  'Голову не ебите',
+  "Видел где то его, поговаривают что он долбаеб диман вроде говорил Борзенков",
+  "Блять Дима Борзенков!",
+  "Ща еще метро там уебут",
+  "Плюшку бы дать",
+  "Я метро зашел там мужик уже с Девяткино с пивом едет",
+  "Голову не ебите",
   "Че распизделись друганы",
   "Вы и щас красавчики братва",
   "Дай газу, братец",
   "После текилы голова говяжья",
   "Корректировку на пивко внесли",
   "Щас пиву дадим понедельник день тяжелый",
-  'братик ну что ты?',
+  "братик ну что ты?",
   "Андрей Минаев",
   "Египетская сила может тоже дать сегодня",
   "Секс",
@@ -75,11 +76,13 @@ bot.onText(/\/start/, (msg) => {
     msg.chat.id,
     `Привет, я Минбот! Я могу не только шутить, но и быть полезным. Вот что я умею:
 
-/weather — покажу погоду в Москве и Мценске
+/weather — покажу погоду в Москве, Мценске и Санкт-Петербурге
 /currency — расскажу курс рубля к доллару и юаню
 /news — пришлю свежие новости
 
-Также могу иногда прислать стикер или фразу для настроения!`
+Иногда создаю опросы.
+
+Также могу прислать стикер или фразу для настроения!`
   );
 });
 
@@ -89,8 +92,14 @@ bot.on("message", (msg) => {
   console.log(msg);
 
   // Реакция на упоминание бота через @username (дополнительно, не return)
-  if (msg.text && botUsername && msg.text.toLowerCase().includes("@" + botUsername.toLowerCase())) {
-    let userText = msg.text.replace(new RegExp("@" + botUsername, "ig"), "").trim();
+  if (
+    msg.text &&
+    botUsername &&
+    msg.text.toLowerCase().includes("@" + botUsername.toLowerCase())
+  ) {
+    let userText = msg.text
+      .replace(new RegExp("@" + botUsername, "ig"), "")
+      .trim();
     const answer = `Сам ты ${userText} братик`;
     bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
     // Не return!
@@ -103,7 +112,7 @@ bot.on("message", (msg) => {
   // Реагируем на ответы на сообщения бота
   if (msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
     const userText = msg.text || "";
-    const answer = `братик "${userText}" не знаю, лучше разравняемся?`;
+    const answer = `Братик "${userText}" не знаю. Может лучше разравняемся?`;
     bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
     return;
   }
@@ -161,17 +170,16 @@ bot.onText(/\/weather/, async (msg) => {
 bot.onText(/\/currency/, async (msg) => {
   const chatId = msg.chat.id;
   try {
+    // Получаем курсы EUR→RUB, EUR→USD, EUR→CNY
     const res = await axios.get(
-      "https://api.exchangerate.host/latest?base=RUB&symbols=USD,CNY"
+      "https://api.frankfurter.app/latest?from=EUR&to=RUB,USD,CNY"
     );
     const rates = res.data.rates;
-    const usd = (1 / rates.USD).toFixed(2);
-    const cny = (1 / rates.CNY).toFixed(2);
-    const reply = `💵 1 USD = ${rates.USD.toFixed(
-      2
-    )} RUB\n💴 1 CNY = ${rates.CNY.toFixed(
-      2
-    )} RUB\n\n1 RUB = ${usd} USD\n1 RUB = ${cny} CNY`;
+    // Кросс-курс: 1 USD = (RUB per EUR) / (USD per EUR)
+    const usd = (rates.RUB / rates.USD).toFixed(2);
+    const eur = rates.RUB.toFixed(2);
+    const cny = (rates.RUB / rates.CNY).toFixed(2);
+    const reply = `💵 1 USD = ${usd} RUB\n💶 1 EUR = ${eur} RUB\n💴 1 CNY = ${cny} RUB`;
     bot.sendMessage(chatId, reply);
   } catch (e) {
     bot.sendMessage(chatId, "Не удалось получить курс валют.");
@@ -187,7 +195,7 @@ bot.onText(/\/news/, async (msg) => {
       .slice(0, 5)
       .map((item) => `• <a href=\"${item.link}\">${item.title}</a>`)
       .join("\n");
-    bot.sendMessage(chatId, `<b>Свежие новости Meduza:</b>\n${news}`, {
+    bot.sendMessage(chatId, `<b>Свежие новости для вас, братики:</b>\n${news}`, {
       parse_mode: "HTML",
       disable_web_page_preview: true,
     });
@@ -212,7 +220,12 @@ const pollQuestions = [
   },
   {
     question: "Кто за пивко на галере?",
-    options: ["Я за!", "Бутылочку бы водочки", "Только мескалик", "Ой тяжко братец"],
+    options: [
+      "Я за!",
+      "Бутылочку бы водочки",
+      "Только мескалик",
+      "Ой тяжко братец",
+    ],
   },
   {
     question: "Мескалика бы ща?",
@@ -220,7 +233,7 @@ const pollQuestions = [
   },
 ];
 
-const schedule = require('node-schedule');
+const schedule = require("node-schedule");
 let pollJobs = [];
 
 function getRandomTimePair() {
@@ -241,12 +254,9 @@ function getRandomTimePair() {
 
 function sendRandomPoll() {
   const poll = pollQuestions[Math.floor(Math.random() * pollQuestions.length)];
-  bot.sendPoll(
-    CHANNEL_CHAT_ID,
-    poll.question,
-    poll.options,
-    { is_anonymous: false }
-  );
+  bot.sendPoll(CHANNEL_CHAT_ID, poll.question, poll.options, {
+    is_anonymous: false,
+  });
 }
 
 function schedulePollsForToday() {
@@ -255,7 +265,10 @@ function schedulePollsForToday() {
   pollJobs = [];
   const times = getRandomTimePair();
   times.forEach((t) => {
-    const job = schedule.scheduleJob({ hour: t.hour, minute: t.minute }, sendRandomPoll);
+    const job = schedule.scheduleJob(
+      { hour: t.hour, minute: t.minute },
+      sendRandomPoll
+    );
     pollJobs.push(job);
   });
 }
@@ -300,6 +313,10 @@ const periodicPhrases = [
   "Але амигосы",
   "Мучачес",
   "Мескалика бы ща",
+  "Шо вы",
+  "Агалы блять",
+  "Да дайте бля",
+  "Не ну вай баля конечно"
 ];
 
 cron.schedule("*/37 * * * *", () => {
@@ -325,5 +342,36 @@ const stickerIds = [
   "CAACAgIAAx0CZ5pVEwABCxYNaHagpPTPyZgWZv4Uv7k-NH3Jn_4AAgxzAAKCXilJn_2bl3zaByI2BA",
   "CAACAgIAAx0CZ5pVEwABCxYOaHags4PC08Oi6ymOgCpdxDIYLEMAAtU8AAIvL0BJuqeOrjC2PSM2BA",
   "CAACAgIAAx0CZ5pVEwABCxYPaHagvLy5H7GcvzBwhx4IaBspmrYAAn9OAAKA64FJMSMTsTA7pY82BA",
-  "CAACAgIAAx0CZ5pVEwABCxc5aHdPZ0eSDV3IwFFj1rqLk4au8rAAApEAA4wS6xvXv4cXJyxP3jYE",
+  "CAACAgIAAx0CZ5pVEwABCxc5aHdPZ0eSDV3IwFFj1rqLk4au8rAAApEAA4wS6xvXv4cXJyxP3jYE"
 ];
+
+const sendRandomNews = async () => {
+  try {
+    const feed = await rssParser.parseURL("https://meduza.io/rss2/all");
+    const items = feed.items;
+    if (!items || items.length === 0) return;
+    const randomItem = items[Math.floor(Math.random() * items.length)];
+    const news = `• <a href=\"${randomItem.link}\">${randomItem.title}</a>`;
+    bot.sendMessage(CHANNEL_CHAT_ID, `<b>Почитайте, братцы:</b>\n${news}`, {
+      parse_mode: "HTML",
+      disable_web_page_preview: false,
+    });
+  } catch (e) {
+    // Не отправляем ничего, если не удалось
+  }
+};
+
+function scheduleRandomNewsCron() {
+  // Снимаем старый, если есть
+  if (global.newsCronJob) global.newsCronJob.stop();
+  // Случайный интервал 2-3 часа
+  const minutes = Math.floor(Math.random() * 60) + 120; // 120-179 минут
+  global.newsCronJob = cron.schedule(`*/${minutes} * * * *`, async () => {
+    await sendRandomNews();
+    scheduleRandomNewsCron(); // Перезапланировать с новым интервалом
+  });
+}
+
+scheduleRandomNewsCron();
+
+
