@@ -97,7 +97,8 @@ bot.on("message", (msg) => {
       .trim();
     const answer = `Сам ты ${userText} братик
     
-    Я вот что могу:
+Я вот что могу:
+
 /weather — покажу погоду
 /news — пришлю подборку свежих новостей
 /photo — пришлю случайную фотку из чата и че нить скажу
@@ -138,8 +139,8 @@ bot.on("message", (msg) => {
     }
   }
 
-  // С вероятностью 5% отправляем эмодзи-реакцию
-  if (Math.random() < 0.14) {
+  // Отправляем эмодзи-реакцию
+  if (Math.random() < 0.07) {
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
     bot.sendMessage(msg.chat.id, randomEmoji, {
       reply_to_message_id: msg.message_id,
@@ -149,15 +150,6 @@ bot.on("message", (msg) => {
     saveUserOfDay(msg.from);
   }
 });
-// для каналов
-// bot.on("channel_post", (msg) => {
-//   const chatId = msg.chat.id;
-//   if (Math.random() < 0.034) {
-//     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-//     bot.sendMessage(chatId, randomPhrase);
-//   }
-// });
-
 // --- Погода ---
 bot.onText(/\/weather/, async (msg) => {
   const chatId = msg.chat.id;
@@ -184,27 +176,6 @@ bot.onText(/\/weather/, async (msg) => {
   }
   bot.sendMessage(chatId, reply, { parse_mode: "HTML" });
 });
-
-// --- Курс валют ---
-bot.onText(/\/currency/, async (msg) => {
-  const chatId = msg.chat.id;
-  try {
-    // Получаем курсы EUR→RUB, EUR→USD, EUR→CNY
-    const res = await axios.get(
-      "https://api.frankfurter.app/latest?from=EUR&to=RUB,USD,CNY"
-    );
-    const rates = res.data.rates;
-    // Кросс-курс: 1 USD = (RUB per EUR) / (USD per EUR)
-    const usd = (rates.RUB / rates.USD).toFixed(2);
-    const eur = rates.RUB.toFixed(2);
-    const cny = (rates.RUB / rates.CNY).toFixed(2);
-    const reply = `💵 1 USD = ${usd} RUB\n💶 1 EUR = ${eur} RUB\n💴 1 CNY = ${cny} RUB`;
-    bot.sendMessage(chatId, reply);
-  } catch (e) {
-    bot.sendMessage(chatId, "Не удалось получить курс валют.");
-  }
-});
-
 // --- Новости ---
 bot.onText(/\/news/, async (msg) => {
   const chatId = msg.chat.id;
@@ -226,7 +197,6 @@ bot.onText(/\/news/, async (msg) => {
     bot.sendMessage(chatId, "Не удалось получить новости.");
   }
 });
-
 // --- Опросы ---
 const schedule = require("node-schedule");
 let pollJobs = [];
@@ -310,7 +280,6 @@ cron.schedule("*/37 * * * *", () => {
     bot.sendMessage(CHANNEL_CHAT_ID, randomPhrase);
   }
 });
-
 // Каждый день в 22:00
 cron.schedule("0 22 * * *", () => {
   bot.sendMessage(CHANNEL_CHAT_ID, "Спать пора мужики");
@@ -339,7 +308,7 @@ function scheduleRandomNewsCron() {
   const minutes = Math.floor(Math.random() * 60) + 120; // 120-179 минут
   global.newsCronJob = cron.schedule(`*/${minutes} * * * *`, async () => {
     await sendRandomNews();
-    scheduleRandomNewsCron(); // Перезапланировать с новым интервалом
+    scheduleRandomNewsCron();
   });
 }
 
