@@ -4,6 +4,8 @@ const cron = require("node-cron");
 const axios = require("axios");
 const RSSParser = require("rss-parser");
 const rssParser = new RSSParser();
+const fs = require('fs');
+const PHOTOS_FILE = 'photos.json';
 
 const token = process.env.BOT_TOKEN;
 
@@ -18,9 +20,11 @@ const phrases = [
   "Видел где то его, поговаривают что он долбаеб диман вроде говорил Борзенков",
   "Блять Дима Борзенков!",
   "Ща еще метро там уебут",
+  "Емае нахуй",
   "Плюшку бы дать",
   "Я метро зашел там мужик уже с Девяткино с пивом едет",
   "Голову не ебите",
+  "Утренние пиво",
   "Че распизделись друганы",
   "Вы и щас красавчики братва",
   "Дай газу, братец",
@@ -57,6 +61,7 @@ const phrases = [
   "Может из тебя коклеты посыпятся борзенков",
   "Обедать будем",
   "Дирябчик",
+  "Так, чуваки, предлагайте идеи, чем нашпиговать бота, чтобы в канале смешно было? Всем Мин!"
 ];
 
 let botId = null;
@@ -90,6 +95,12 @@ bot.onText(/\/start/, (msg) => {
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
   console.log(msg);
+
+  // Сохраняем file_id самой большой фотки
+  if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
+    const largest = msg.photo[msg.photo.length - 1];
+    savePhotoId(largest.file_id);
+  }
 
   // Реакция на упоминание бота через @username (дополнительно, не return)
   if (
@@ -373,5 +384,49 @@ function scheduleRandomNewsCron() {
 }
 
 scheduleRandomNewsCron();
+
+function savePhotoId(fileId) {
+  let arr = [];
+  if (fs.existsSync(PHOTOS_FILE)) {
+    try { arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, 'utf8')); } catch {}
+  }
+  if (!arr.includes(fileId)) {
+    arr.push(fileId);
+    fs.writeFileSync(PHOTOS_FILE, JSON.stringify(arr));
+  }
+}
+
+const photoCaptions = [
+  'Посмотрите на этого добряка',
+  'Вот братик',
+  'Вай баля, смотрите, какая фотка',
+  'Агалы, оцените кадр',
+  'Братва, зацените!',
+  'Вот это кадр! Как пиво!',
+  'Ну красавчик же!',
+  'Вот это фото!',
+  'Батрачка на фото',
+  'Мескалика бы под такую фотку',
+];
+
+function sendRandomPhoto() {
+  if (!fs.existsSync(PHOTOS_FILE)) return;
+  let arr = [];
+  try { arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, 'utf8')); } catch {}
+  if (!arr.length) return;
+  const fileId = arr[Math.floor(Math.random() * arr.length)];
+  const caption = photoCaptions[Math.floor(Math.random() * photoCaptions.length)];
+  bot.sendPhoto(CHANNEL_CHAT_ID, fileId, { caption });
+}
+
+function scheduleRandomPhotoCron() {
+  if (global.photoCronJob) global.photoCronJob.stop();
+  const minutes = Math.floor(Math.random() * 60) + 480/3; // 160-219 минут (2-3 раза в день)
+  global.photoCronJob = cron.schedule(`*/${Math.floor(minutes)} * * * *`, () => {
+    sendRandomPhoto();
+    scheduleRandomPhotoCron();
+  });
+}
+scheduleRandomPhotoCron();
 
 
