@@ -9,6 +9,7 @@ const PHOTOS_FILE = "photos.json";
 const USERS_OF_DAY_FILE = "usersOfDay.json";
 const insultsOfDay = require("./insultsOfDay");
 const BRATDNYA_FILE = 'bratdnya.json';
+const GIFS_FILE = 'gifs.json';
 const { initRoulette } = require('./roulette');
 
 const token = process.env.BOT_TOKEN;
@@ -58,7 +59,7 @@ bot.onText(/\/start/, (msg) => {
 /photo — пришлю случайную фотку из чата
 /bratdnya — выберу "брата дня"
 /pivko — выберу, кто угощает пивком
-/mescal — выберу, кто угощает мескаликом
+/mezcal — выберу, кто угощает мескаликом
 /photo – отправлю фотку из чата с комментарием
 /roulette — постреляю всех
 
@@ -94,10 +95,18 @@ bot.on('message', (msg) => {
     saveStickerId(msg.sticker.file_id);
   }
 
+  // Сохраняем file_id гифок
+  if (!handled && msg.animation && msg.animation.file_id) {
+    saveGifId(msg.animation.file_id);
+  }
+  if (!handled && msg.document && (msg.document.mime_type === 'video/mp4' || msg.document.mime_type === 'image/gif') && msg.document.file_id) {
+    saveGifId(msg.document.file_id);
+  }
+
   // Реакция на упоминание бота через @username
   if (!handled && msg.text && botUsername && msg.text.toLowerCase().includes("@" + botUsername.toLowerCase())) {
     let userText = msg.text.replace(new RegExp("@" + botUsername, "ig"), "").trim();
-    const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/photo — пришлю случайную фотку из чата и че нить скажу\n/bratdnya — выберу \"брата дня\"\n/check_pivko — выберу, кто угощает пивком\n/check_mescal — выберу, кто угощает мескаликом\n/photo – отправлю фотку из чата с комментарием`;
+    const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/photo — пришлю случайную фотку из чата и че нить скажу\n/bratdnya — выберу \"брата дня\"\n/pivko — выберу, кто угощает пивком\n/mezcal — выберу, кто угощает мескаликом\n/photo – отправлю фотку из чата с комментарием`;
     bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
     handled = true;
     return;
@@ -123,8 +132,15 @@ bot.on('message', (msg) => {
     return;
   }
 
-  // С вероятностью 3% отправляем эмодзи-реакцию
+  // С вероятностью 3% отправляем гифку, иначе обычную реакцию
   if (!handled && Math.random() < 0.03) {
+    const gifId = getRandomGifId();
+    if (gifId) {
+      bot.sendAnimation(msg.chat.id, gifId, { reply_to_message_id: msg.message_id });
+      handled = true;
+      return;
+    }
+    // Если гифок нет — обычная реакция
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
     bot.sendMessage(msg.chat.id, randomEmoji, { reply_to_message_id: msg.message_id });
     handled = true;
@@ -448,7 +464,7 @@ bot.onText(/\/pivko/, (msg) => {
   bot.sendMessage(msg.chat.id, text);
 });
 
-bot.onText(/\/mescal/, (msg) => {
+bot.onText(/\/mezcal/, (msg) => {
   if (!fs.existsSync(USERS_OF_DAY_FILE)) return;
   let arr = [];
   try {
@@ -464,3 +480,21 @@ bot.onText(/\/mescal/, (msg) => {
 });
 
 initRoulette(bot);
+
+function saveGifId(fileId) {
+  let arr = [];
+  if (fs.existsSync(GIFS_FILE)) {
+    try { arr = JSON.parse(fs.readFileSync(GIFS_FILE, 'utf8')); } catch {}
+  }
+  if (!arr.includes(fileId)) {
+    arr.push(fileId);
+    fs.writeFileSync(GIFS_FILE, JSON.stringify(arr));
+  }
+}
+function getRandomGifId() {
+  if (!fs.existsSync(GIFS_FILE)) return null;
+  let arr = [];
+  try { arr = JSON.parse(fs.readFileSync(GIFS_FILE, 'utf8')); } catch {}
+  if (!arr.length) return null;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
