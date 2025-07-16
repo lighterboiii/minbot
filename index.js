@@ -11,58 +11,11 @@ const token = process.env.BOT_TOKEN;
 
 const bot = new TelegramBot(token, { polling: true });
 
-const phrases = [
-  "Что ты вообще несёшь?",
-  "Ты в своём уме?",
-  "Мескаликом еще закрепил",
-  "Что да да Минай",
-  "Предлагаю Диману смачно пойти нахуй",
-  "Видел где то его, поговаривают что он долбаеб диман вроде говорил Борзенков",
-  "Блять Дима Борзенков!",
-  "Ща еще метро там уебут",
-  "Емае нахуй",
-  "Плюшку бы дать",
-  "Я метро зашел там мужик уже с Девяткино с пивом едет",
-  "Голову не ебите",
-  "Утренние пиво",
-  "Че распизделись друганы",
-  "Вы и щас красавчики братва",
-  "Дай газу, братец",
-  "После текилы голова говяжья",
-  "Корректировку на пивко внесли",
-  "Щас пиву дадим понедельник день тяжелый",
-  "братик ну что ты?",
-  "Андрей Минаев",
-  "Египетская сила может тоже дать сегодня",
-  "Секс",
-  "Вери гуд",
-  "Джабки особенной вырублю. Ебать ахуеем",
-  "напротив замка пиво сидел пил в пятницу",
-  "ОПА в пятницу тоже бухать пойду",
-  "Да тяжко",
-  "Не ну",
-  "Пивасиком разравняться",
-  "Батрачка",
-  "На галере что ли?",
-  "Хуй знает, братец",
-  "Вай баля",
-  "Вы что ахуели?",
-  "НЕТ ВОЙНЕ",
-  "Работайте братья",
-  "Нашел бар в СПб где курить можно внутри",
-  "браатик",
-  "Чурка бля",
-  "Опа нихуя",
-  "Ну давай давай нападай",
-  "Скиньте Славе тысячу на тинькофф",
-  "Вася крутой чел",
-  "Пошел димасик нахуй",
-  "Долбаеб",
-  "Может из тебя коклеты посыпятся борзенков",
-  "Обедать будем",
-  "Дирябчик",
-  "Так, чуваки, предлагайте идеи, чем нашпиговать бота, чтобы в канале смешно было? Всем Мин!"
-];
+const phrases = require('./phrases');
+const photoCaptions = require('./photoCaptions');
+const pollQuestions = require('./pollQuestions');
+const stickerIds = require('./stickerIds');
+const periodicPhrases = require('./periodicPhrases');
 
 let botId = null;
 let botUsername = null;
@@ -84,6 +37,7 @@ bot.onText(/\/start/, (msg) => {
 /weather — покажу погоду в Москве, Мценске и Санкт-Петербурге
 /currency — расскажу курс рубля к доллару и юаню
 /news — пришлю свежие новости
+/photo – отправлю фотку из чата с комментарием
 
 Иногда создаю опросы.
 
@@ -216,34 +170,6 @@ bot.onText(/\/news/, async (msg) => {
 });
 
 // --- Опросы ---
-const pollQuestions = [
-  {
-    question: "Кто на галере сегодня?",
-    options: ["Я на галере", "Я пиво пью", "Батрачка!", "А что за галера?"],
-  },
-  {
-    question: "Кто по мескалику бы дал?",
-    options: ["Я бы дал!", "Я пас", "Только пивко", "Что такое мескалик?"],
-  },
-  {
-    question: "Пивко сегодня будет?",
-    options: ["Будет", "Нет", "Я за рулём с часами", "Тяжко"],
-  },
-  {
-    question: "Кто за пивко на галере?",
-    options: [
-      "Я за!",
-      "Бутылочку бы водочки",
-      "Только мескалик",
-      "Ой тяжко братец",
-    ],
-  },
-  {
-    question: "Мескалика бы ща?",
-    options: ["Да!", "Нет!", "Лучше пивка два а то и три", "я на галере брат"],
-  },
-];
-
 const schedule = require("node-schedule");
 let pollJobs = [];
 
@@ -319,17 +245,6 @@ cron.schedule("0 7 * * *", async () => {
   bot.sendMessage(CHANNEL_CHAT_ID, reply, { parse_mode: "HTML" });
 });
 
-const periodicPhrases = [
-  "Че притихли братульцы?",
-  "Але амигосы",
-  "Мучачес",
-  "Мескалика бы ща",
-  "Шо вы",
-  "Агалы блять",
-  "Да дайте бля",
-  "Не ну вай баля конечно"
-];
-
 cron.schedule("*/37 * * * *", () => {
   const randomPhrase =
     periodicPhrases[Math.floor(Math.random() * periodicPhrases.length)];
@@ -342,19 +257,6 @@ cron.schedule("*/37 * * * *", () => {
 cron.schedule("0 22 * * *", () => {
   bot.sendMessage(CHANNEL_CHAT_ID, "Спать пора мужики");
 });
-
-// file_id стикера для отправки
-const stickerIds = [
-  "CAACAgIAAx0CZ5pVEwABCxYGaHaf8E8XAAHKIvFhQAaxt6BK0J9OAAKCAAPHwsIgyP97roQJ6W42BA",
-  "CAACAgIAAx0CZ5pVEwABCxYIaHagSuWH8X0JFUTyZRQdEjmmGbAAAlMAA8fCwiDYYvwqMZKy1zYE",
-  "CAACAgIAAxkBAAN-aHafo8ofwR5wz0SPOncnioGzt4gAAv1RAALITHFKuuMcV_EejH82BA",
-  "CAACAgIAAx0CZ5pVEwABCxYLaHagiRak11JEiKYlFPxd77IiOf4AAg0XAAKS9vBJ9xaUt_eoMbE2BA",
-  "CAACAgQAAx0CZ5pVEwABCxYMaHagl0tlUTOYj1YnSyzLNHlRZH8AAlEPAAKm8XEedZ60Jhfak4Y2BA",
-  "CAACAgIAAx0CZ5pVEwABCxYNaHagpPTPyZgWZv4Uv7k-NH3Jn_4AAgxzAAKCXilJn_2bl3zaByI2BA",
-  "CAACAgIAAx0CZ5pVEwABCxYOaHags4PC08Oi6ymOgCpdxDIYLEMAAtU8AAIvL0BJuqeOrjC2PSM2BA",
-  "CAACAgIAAx0CZ5pVEwABCxYPaHagvLy5H7GcvzBwhx4IaBspmrYAAn9OAAKA64FJMSMTsTA7pY82BA",
-  "CAACAgIAAx0CZ5pVEwABCxc5aHdPZ0eSDV3IwFFj1rqLk4au8rAAApEAA4wS6xvXv4cXJyxP3jYE"
-];
 
 const sendRandomNews = async () => {
   try {
@@ -396,19 +298,6 @@ function savePhotoId(fileId) {
   }
 }
 
-const photoCaptions = [
-  'Посмотрите на этого добряка',
-  'Вот братик',
-  'Вай баля, смотрите, какая фотка',
-  'Агалы, оцените кадр',
-  'Братва, зацените!',
-  'Вот это кадр! Как пиво!',
-  'Ну красавчик же!',
-  'Вот это фото!',
-  'Батрачка на фото',
-  'Мескалика бы под такую фотку',
-];
-
 function sendRandomPhoto() {
   if (!fs.existsSync(PHOTOS_FILE)) return;
   let arr = [];
@@ -428,5 +317,15 @@ function scheduleRandomPhotoCron() {
   });
 }
 scheduleRandomPhotoCron();
+
+bot.onText(/\/photo/, (msg) => {
+  if (!fs.existsSync(PHOTOS_FILE)) return;
+  let arr = [];
+  try { arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, 'utf8')); } catch {}
+  if (!arr.length) return;
+  const fileId = arr[Math.floor(Math.random() * arr.length)];
+  const caption = photoCaptions[Math.floor(Math.random() * photoCaptions.length)];
+  bot.sendPhoto(msg.chat.id, fileId, { caption });
+});
 
 
