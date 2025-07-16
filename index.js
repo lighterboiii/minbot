@@ -133,24 +133,23 @@ bot.on("channel_post", (msg) => {
 // --- Погода ---
 bot.onText(/\/weather/, async (msg) => {
   const chatId = msg.chat.id;
-  const apiKey = process.env.OWM_API_KEY || "9a4c8c4dbacfadf76b6128331b053eaa";
+  const apiKey = process.env.OWM_API_KEY || "";
   const cities = [
-    { name: "Москва", query: "Moscow.ru" },
-    { name: "Мценск", query: "Mtsensk.ru" },
+    { name: "Москва", query: "Moscow" },
+    { name: "Мценск", query: "Mtsensk" },
+    { name: "Санкт-Петербург", query: "Saint Petersburg" },
   ];
   let reply = "";
   for (const city of cities) {
     try {
-      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.query}&appid=${apiKey}&units=metric&lang=ru`;
+      const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city.query}&lang=ru`;
       const res = await axios.get(url);
       const w = res.data;
-      reply += `🌤 <b>${city.name}</b>: ${w.weather[0].description}, ${w.main.temp}°C\n`;
+      reply += `🌤 <b>${city.name}</b>: ${w.current.condition.text}, ${w.current.temp_c}°C\n`;
     } catch (e) {
-      if (e.response) {
-        console.log("OpenWeatherMap error:", e.response.data);
-        reply += `Ошибка: ${e.response.data.message} для ${city.name}\n`;
+      if (e.response && e.response.data && e.response.data.error) {
+        reply += `Ошибка: ${e.response.data.error.message} для ${city.name}\n`;
       } else {
-        console.log("OpenWeatherMap error:", e);
         reply += `Не удалось получить погоду для ${city.name}\n`;
       }
     }
@@ -217,7 +216,7 @@ const pollQuestions = [
   },
   {
     question: "Мескалика бы ща?",
-    options: ["Да!", "Нет", "Лучше пивка два а то и три", "я на галере брат"],
+    options: ["Да!", "Нет!", "Лучше пивка два а то и три", "я на галере брат"],
   },
 ];
 
@@ -269,8 +268,31 @@ schedulePollsForToday();
 const CHANNEL_CHAT_ID = process.env.CHANNEL_CHAT_ID || "YOUR_CHANNEL_CHAT_ID";
 
 // Каждый день в 8:00 утра по серверному времени
-cron.schedule("0 8 * * *", () => {
+cron.schedule("0 7 * * *", async () => {
   bot.sendMessage(CHANNEL_CHAT_ID, "Здарова, Мужики");
+  // Погода утром
+  const apiKey = process.env.OWM_API_KEY || "";
+  const cities = [
+    { name: "Москва", query: "Moscow" },
+    { name: "Мценск", query: "Mtsensk" },
+    { name: "Санкт-Петербург", query: "Saint Petersburg" },
+  ];
+  let reply = "Погодка нынче такая у нас";
+  for (const city of cities) {
+    try {
+      const url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city.query}&lang=ru`;
+      const res = await axios.get(url);
+      const w = res.data;
+      reply += `🌤 <b>${city.name}</b>: ${w.current.condition.text}, ${w.current.temp_c}°C\n`;
+    } catch (e) {
+      if (e.response && e.response.data && e.response.data.error) {
+        reply += `Ошибка: ${e.response.data.error.message} для ${city.name}\n`;
+      } else {
+        reply += `Не удалось получить погоду для ${city.name}\n`;
+      }
+    }
+  }
+  bot.sendMessage(CHANNEL_CHAT_ID, reply, { parse_mode: "HTML" });
 });
 
 const periodicPhrases = [
