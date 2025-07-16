@@ -23,18 +23,9 @@ const stickerIds = require("./stickerIds");
 const periodicPhrases = require("./periodicPhrases");
 const emojis = require("./emojis");
 const insults = require("./insults");
+const slavaTriggers = require("./slavaTriggers");
 
 const SLAVA_ID = 653015244;
-const slavaTriggers = [
-  "слава",
-  "славик",
-  "Слава",
-  "Славой",
-  "Славу",
-  "Славе",
-  "О славе",
-  "славой",
-];
 
 let botId = null;
 let botUsername = null;
@@ -73,6 +64,20 @@ bot.on('message', (msg) => {
   let handled = false;
   const lowerCaseText = (msg.text || "").toLowerCase();
 
+  // 1. Reply на сообщение бота
+  if (!handled && msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
+    if (msg.text) {
+      const userText = msg.text;
+      const answer = `Братик "${userText}" не знаю. Может лучше разравняемся?`;
+      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    } else if (msg.sticker) {
+      const answer = `Братик, ты мне стикер кидаешь? Может лучше разравняемся?`;
+      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    }
+    // handled = true;
+    return;
+  }
+
   // Персональная реакция на Славу
   if (!handled && msg.from.id === SLAVA_ID && slavaTriggers.some(trigger => lowerCaseText.includes(trigger))) {
     const randomInsult = insults[Math.floor(Math.random() * insults.length)];
@@ -80,9 +85,6 @@ bot.on('message', (msg) => {
     handled = true;
     return;
   }
-
-  // Участие в рулетке (handled внутри roulette.js)
-  // ... (roulette.js сам обрабатывает и не вызывает return здесь)
 
   // Сохраняем file_id самой большой фотки
   if (!handled && msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
@@ -114,20 +116,6 @@ bot.on('message', (msg) => {
 
   // Игнорировать команды, кроме /start
   if (!handled && msg.text && msg.text.startsWith("/") && !msg.text.startsWith("/start")) {
-    handled = true;
-    return;
-  }
-
-  // Реагируем на ответы на сообщения бота
-  if (!handled && msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
-    if (msg.text) {
-      const userText = msg.text;
-      const answer = `Братик \"${userText}\" не знаю. Может лучше разравняемся?`;
-      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
-    } else if (msg.sticker) {
-      const answer = `Братик, ты мне стикер кидаешь? Может лучше разравняемся?`;
-      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
-    }
     handled = true;
     return;
   }
