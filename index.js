@@ -4,25 +4,34 @@ const cron = require("node-cron");
 const axios = require("axios");
 const RSSParser = require("rss-parser");
 const rssParser = new RSSParser();
-const fs = require('fs');
-const PHOTOS_FILE = 'photos.json';
-const USERS_OF_DAY_FILE = 'usersOfDay.json';
-const insultsOfDay = require('./insultsOfDay');
+const fs = require("fs");
+const PHOTOS_FILE = "photos.json";
+const USERS_OF_DAY_FILE = "usersOfDay.json";
+const insultsOfDay = require("./insultsOfDay");
 
 const token = process.env.BOT_TOKEN;
 
 const bot = new TelegramBot(token, { polling: true });
 
-const phrases = require('./phrases');
-const photoCaptions = require('./photoCaptions');
-const pollQuestions = require('./pollQuestions');
-const stickerIds = require('./stickerIds');
-const periodicPhrases = require('./periodicPhrases');
-const emojis = require('./emojis');
-const insults = require('./insults');
+const phrases = require("./phrases");
+const photoCaptions = require("./photoCaptions");
+const pollQuestions = require("./pollQuestions");
+const stickerIds = require("./stickerIds");
+const periodicPhrases = require("./periodicPhrases");
+const emojis = require("./emojis");
+const insults = require("./insults");
 
 const SLAVA_ID = 653015244;
-const slavaTriggers = ["слава", "славик", "Слава", "Славой", "Славу", "Славе", "О славе", "славой"];
+const slavaTriggers = [
+  "слава",
+  "славик",
+  "Слава",
+  "Славой",
+  "Славу",
+  "Славе",
+  "О славе",
+  "славой",
+];
 
 let botId = null;
 let botUsername = null;
@@ -41,14 +50,16 @@ bot.onText(/\/start/, (msg) => {
     msg.chat.id,
     `Привет, я Минбот! Я могу не только шутить, но и быть полезным. Вот что я умею:
 
-/weather — покажу погоду в Москве, Мценске и Санкт-Петербурге
-/currency — расскажу курс рубля к доллару и юаню
-/news — пришлю свежие новости
+/weather — покажу погоду
+/news — пришлю подборку свежих новостей
+
+/photo — пришлю случайную фотку из чата
+/bratdnya — выберу "брата дня"
+/check_pivko — выберу, кто угощает пивком
+/check_mescal — выберу, кто угощает мескаликом
 /photo – отправлю фотку из чата с комментарием
 
-Иногда создаю опросы.
-
-Также могу прислать стикер или фразу для настроения!`
+Также я иногда сам пишу в чат, отправляю фотки, новости, создаю опросы и эмодзи!`
   );
 });
 
@@ -58,9 +69,14 @@ bot.on("message", (msg) => {
   const lowerCaseText = (msg.text || "").toLowerCase();
 
   // Реакция на Славу
-  if (msg.from.id === SLAVA_ID && slavaTriggers.some(trigger => lowerCaseText.includes(trigger))) {
+  if (
+    msg.from.id === SLAVA_ID &&
+    slavaTriggers.some((trigger) => lowerCaseText.includes(trigger))
+  ) {
     const randomInsult = insults[Math.floor(Math.random() * insults.length)];
-    bot.sendMessage(chatId, randomInsult, { reply_to_message_id: msg.message_id });
+    bot.sendMessage(chatId, randomInsult, {
+      reply_to_message_id: msg.message_id,
+    });
     return;
   }
 
@@ -79,7 +95,16 @@ bot.on("message", (msg) => {
     let userText = msg.text
       .replace(new RegExp("@" + botUsername, "ig"), "")
       .trim();
-    const answer = `Сам ты ${userText} братик`;
+    const answer = `Сам ты ${userText} братик
+    
+    Я вот что могу:
+/weather — покажу погоду
+/news — пришлю подборку свежих новостей
+/photo — пришлю случайную фотку из чата и че нить скажу
+/bratdnya — выберу "брата дня"
+/check_pivko — выберу, кто угощает пивком
+/check_mescal — выберу, кто угощает мескаликом
+/photo – отправлю фотку из чата с комментарием`;
     bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
   }
 
@@ -116,7 +141,9 @@ bot.on("message", (msg) => {
   // С вероятностью 5% отправляем эмодзи-реакцию
   if (Math.random() < 0.14) {
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    bot.sendMessage(msg.chat.id, randomEmoji, { reply_to_message_id: msg.message_id });
+    bot.sendMessage(msg.chat.id, randomEmoji, {
+      reply_to_message_id: msg.message_id,
+    });
   }
   if (msg.from && msg.from.id) {
     saveUserOfDay(msg.from);
@@ -187,10 +214,14 @@ bot.onText(/\/news/, async (msg) => {
       .slice(0, 5)
       .map((item) => `• <a href=\"${item.link}\">${item.title}</a>`)
       .join("\n");
-    bot.sendMessage(chatId, `<b>Свежие новости для вас, братики:</b>\n${news}`, {
-      parse_mode: "HTML",
-      disable_web_page_preview: true,
-    });
+    bot.sendMessage(
+      chatId,
+      `<b>Свежие новости для вас, братики:</b>\n${news}`,
+      {
+        parse_mode: "HTML",
+        disable_web_page_preview: true,
+      }
+    );
   } catch (e) {
     bot.sendMessage(chatId, "Не удалось получить новости.");
   }
@@ -317,7 +348,9 @@ scheduleRandomNewsCron();
 function savePhotoId(fileId) {
   let arr = [];
   if (fs.existsSync(PHOTOS_FILE)) {
-    try { arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, 'utf8')); } catch {}
+    try {
+      arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, "utf8"));
+    } catch {}
   }
   if (!arr.includes(fileId)) {
     arr.push(fileId);
@@ -328,40 +361,55 @@ function savePhotoId(fileId) {
 function sendRandomPhoto() {
   if (!fs.existsSync(PHOTOS_FILE)) return;
   let arr = [];
-  try { arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, 'utf8')); } catch {}
+  try {
+    arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, "utf8"));
+  } catch {}
   if (!arr.length) return;
   const fileId = arr[Math.floor(Math.random() * arr.length)];
-  const caption = photoCaptions[Math.floor(Math.random() * photoCaptions.length)];
+  const caption =
+    photoCaptions[Math.floor(Math.random() * photoCaptions.length)];
   bot.sendPhoto(CHANNEL_CHAT_ID, fileId, { caption });
 }
 
 function scheduleRandomPhotoCron() {
   if (global.photoCronJob) global.photoCronJob.stop();
-  const minutes = Math.floor(Math.random() * 60) + 480/3; // 160-219 минут (2-3 раза в день)
-  global.photoCronJob = cron.schedule(`*/${Math.floor(minutes)} * * * *`, () => {
-    sendRandomPhoto();
-    scheduleRandomPhotoCron();
-  });
+  const minutes = Math.floor(Math.random() * 60) + 480 / 3; // 160-219 минут (2-3 раза в день)
+  global.photoCronJob = cron.schedule(
+    `*/${Math.floor(minutes)} * * * *`,
+    () => {
+      sendRandomPhoto();
+      scheduleRandomPhotoCron();
+    }
+  );
 }
 scheduleRandomPhotoCron();
 
 bot.onText(/\/photo/, (msg) => {
   if (!fs.existsSync(PHOTOS_FILE)) return;
   let arr = [];
-  try { arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, 'utf8')); } catch {}
+  try {
+    arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, "utf8"));
+  } catch {}
   if (!arr.length) return;
   const fileId = arr[Math.floor(Math.random() * arr.length)];
-  const caption = photoCaptions[Math.floor(Math.random() * photoCaptions.length)];
+  const caption =
+    photoCaptions[Math.floor(Math.random() * photoCaptions.length)];
   bot.sendPhoto(msg.chat.id, fileId, { caption });
 });
 
 function saveUserOfDay(user) {
   let arr = [];
   if (fs.existsSync(USERS_OF_DAY_FILE)) {
-    try { arr = JSON.parse(fs.readFileSync(USERS_OF_DAY_FILE, 'utf8')); } catch {}
+    try {
+      arr = JSON.parse(fs.readFileSync(USERS_OF_DAY_FILE, "utf8"));
+    } catch {}
   }
-  if (!arr.some(u => u.id === user.id)) {
-    arr.push({ id: user.id, username: user.username || '', first_name: user.first_name || '' });
+  if (!arr.some((u) => u.id === user.id)) {
+    arr.push({
+      id: user.id,
+      username: user.username || "",
+      first_name: user.first_name || "",
+    });
     fs.writeFileSync(USERS_OF_DAY_FILE, JSON.stringify(arr));
   }
 }
@@ -369,18 +417,50 @@ function saveUserOfDay(user) {
 function sendBratDnya() {
   if (!fs.existsSync(USERS_OF_DAY_FILE)) return;
   let arr = [];
-  try { arr = JSON.parse(fs.readFileSync(USERS_OF_DAY_FILE, 'utf8')); } catch {}
+  try {
+    arr = JSON.parse(fs.readFileSync(USERS_OF_DAY_FILE, "utf8"));
+  } catch {}
   if (!arr.length) return;
   const user = arr[Math.floor(Math.random() * arr.length)];
   const insult = insultsOfDay[Math.floor(Math.random() * insultsOfDay.length)];
-  const mention = user.username ? `@${user.username}` : user.first_name || 'братец';
+  const mention = user.username
+    ? `@${user.username}`
+    : user.first_name || "братец";
   const text = `Сегодня ${insult} дня — ${mention}! Поздравляем, братик! Иди ка нахуй теперь давай поскорее.`;
   bot.sendMessage(CHANNEL_CHAT_ID, text);
 }
 
-cron.schedule('0 13 * * *', sendBratDnya);
+cron.schedule("0 13 * * *", sendBratDnya);
 bot.onText(/\/bratdnya/, (msg) => {
   sendBratDnya();
 });
 
+bot.onText(/\/check_pivko/, (msg) => {
+  if (!fs.existsSync(USERS_OF_DAY_FILE)) return;
+  let arr = [];
+  try {
+    arr = JSON.parse(fs.readFileSync(USERS_OF_DAY_FILE, "utf8"));
+  } catch {}
+  if (!arr.length) return;
+  const user = arr[Math.floor(Math.random() * arr.length)];
+  const mention = user.username
+    ? `@${user.username}`
+    : user.first_name || "братец";
+  const text = `Чек на пивко: ${mention}, сегодня твоя очередь угощать!`;
+  bot.sendMessage(msg.chat.id, text);
+});
 
+bot.onText(/\/check_mescal/, (msg) => {
+  if (!fs.existsSync(USERS_OF_DAY_FILE)) return;
+  let arr = [];
+  try {
+    arr = JSON.parse(fs.readFileSync(USERS_OF_DAY_FILE, "utf8"));
+  } catch {}
+  if (!arr.length) return;
+  const user = arr[Math.floor(Math.random() * arr.length)];
+  const mention = user.username
+    ? `@${user.username}`
+    : user.first_name || "братец";
+  const text = `Чек на мескалик: ${mention}, сегодня твоя очередь угощать!`;
+  bot.sendMessage(msg.chat.id, text);
+});
