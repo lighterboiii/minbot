@@ -6,6 +6,7 @@ const RSSParser = require("rss-parser");
 const rssParser = new RSSParser();
 const fs = require('fs');
 const PHOTOS_FILE = 'photos.json';
+const STICKERS_JSON = 'stickers.json';
 
 const token = process.env.BOT_TOKEN;
 
@@ -16,6 +17,7 @@ const photoCaptions = require('./photoCaptions');
 const pollQuestions = require('./pollQuestions');
 const stickerIds = require('./stickerIds');
 const periodicPhrases = require('./periodicPhrases');
+const emojis = require('./emojis');
 
 let botId = null;
 let botUsername = null;
@@ -67,7 +69,6 @@ bot.on("message", (msg) => {
       .trim();
     const answer = `Сам ты ${userText} братик`;
     bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
-    // Не return!
   }
 
   // Игнорировать команды, кроме /start
@@ -76,9 +77,14 @@ bot.on("message", (msg) => {
 
   // Реагируем на ответы на сообщения бота
   if (msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
-    const userText = msg.text || "";
-    const answer = `Братик "${userText}" не знаю. Может лучше разравняемся?`;
-    bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    if (msg.text) {
+      const userText = msg.text;
+      const answer = `Братик ${userText} не знаю. Может лучше разравняемся?`;
+      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    } else if (msg.sticker) {
+      const answer = `Братик, ты мне стикер отправил? Может лучше деньги Славе скинешь на пивко?`;
+      bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    }
     return;
   }
 
@@ -94,15 +100,21 @@ bot.on("message", (msg) => {
       bot.sendMessage(chatId, randomPhrase);
     }
   }
-});
 
-bot.on("channel_post", (msg) => {
-  const chatId = msg.chat.id;
-  if (Math.random() < 0.034) {
-    const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
-    bot.sendMessage(chatId, randomPhrase);
+  // С вероятностью 5% отправляем эмодзи-реакцию
+  if (Math.random() < 0.14) {
+    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    bot.sendMessage(msg.chat.id, randomEmoji, { reply_to_message_id: msg.message_id });
   }
 });
+// для каналов
+// bot.on("channel_post", (msg) => {
+//   const chatId = msg.chat.id;
+//   if (Math.random() < 0.034) {
+//     const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+//     bot.sendMessage(chatId, randomPhrase);
+//   }
+// });
 
 // --- Погода ---
 bot.onText(/\/weather/, async (msg) => {
