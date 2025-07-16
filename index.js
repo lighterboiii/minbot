@@ -18,6 +18,10 @@ const pollQuestions = require('./pollQuestions');
 const stickerIds = require('./stickerIds');
 const periodicPhrases = require('./periodicPhrases');
 const emojis = require('./emojis');
+const insults = require('./insults');
+
+const SLAVA_ID = 653015244;
+const slavaTriggers = ["слава", "славик"];
 
 let botId = null;
 let botUsername = null;
@@ -50,7 +54,14 @@ bot.onText(/\/start/, (msg) => {
 // Ответ на любое текстовое сообщение
 bot.on("message", (msg) => {
   const chatId = msg.chat.id;
-  console.log(msg);
+  const lowerCaseText = (msg.text || "").toLowerCase();
+
+  // Реакция на Славу
+  if (msg.from.id === SLAVA_ID && slavaTriggers.some(trigger => lowerCaseText.includes(trigger))) {
+    const randomInsult = insults[Math.floor(Math.random() * insults.length)];
+    bot.sendMessage(chatId, randomInsult, { reply_to_message_id: msg.message_id });
+    return;
+  }
 
   // Сохраняем file_id самой большой фотки
   if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
