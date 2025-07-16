@@ -1,0 +1,118 @@
+[dotenv@17.2.0] injecting env (3) from .env (tip: ⚙️  override existing env vars with { override: true })
+Bot ID: 8132604127
+Bot username: pesdabolbot
+{
+  message_id: 726845,
+  from: {
+    id: 172359056,
+    is_bot: false,
+    first_name: 'Славный',
+    last_name: 'Малый',
+    username: 'lighterboii',
+    language_code: 'ru'
+  },
+  chat: {
+    id: -1001738167571,
+    title: 'Ультрамегаклёвые челы',
+    type: 'supergroup'
+  },
+  date: 1752650122,
+  text: 'так'
+}
+{
+  message_id: 726846,
+  from: {
+    id: 172359056,
+    is_bot: false,
+    first_name: 'Славный',
+    last_name: 'Малый',
+    username: 'lighterboii',
+    language_code: 'ru'
+  },
+  chat: {
+    id: -1001738167571,
+    title: 'Ультрамегаклёвые челы',
+    type: 'supergroup'
+  },
+  date: 1752650124,
+  text: "@pesdabolbot 'q",
+  entities: [ { offset: 0, length: 12, type: 'mention' } ]
+}
+{
+  message_id: 726848,
+  from: {
+    id: 168853874,
+    is_bot: false,
+    first_name: 'mr.min',
+    username: 'andreymineys',
+    language_code: 'ru'
+  },
+  chat: {
+    id: -1001738167571,
+    title: 'Ультрамегаклёвые челы',
+    type: 'supergroup'
+  },
+  date: 1752650146,
+  animation: {
+    mime_type: 'video/mp4',
+    duration: 11,
+    width: 400,
+    height: 480,
+    thumbnail: {
+      file_id: 'AAMCAgADHQJnmlUTAAELF0Bod1Gi4aQ79ASONITm5B1CwuIpnQACjDYAAs9c6UqP9nhimA78xQEAB20AAzYE',
+      file_unique_id: 'AQADjDYAAs9c6Upy',
+      file_size: 21125,
+      width: 267,
+      height: 320
+    },
+    thumb: {
+      file_id: 'AAMCAgADHQJnmlUTAAELF0Bod1Gi4aQ79ASONITm5B1CwuIpnQACjDYAAs9c6UqP9nhimA78xQEAB20AAzYE',
+      file_unique_id: 'AQADjDYAAs9c6Upy',
+      file_size: 21125,
+      width: 267,
+      height: 320
+    },
+    file_id: 'CgACAgIAAx0CZ5pVEwABCxdAaHdRouGkO_QEjjSE5uQdQsLiKZ0AAow2AALPXOlKj_Z4YpgO_MU2BA',
+    file_unique_id: 'AgADjDYAAs9c6Uo',
+    file_size: 1337313
+  },
+  document: {
+    mime_type: 'video/mp4',
+    thumbnail: {
+      file_id: 'AAMCAgADHQJnmlUTAAELF0Bod1Gi4aQ79ASONITm5B1CwuIpnQACjDYAAs9c6UqP9nhimA78xQEAB20AAzYE',
+      file_unique_id: 'AQADjDYAAs9c6Upy',
+      file_size: 21125,
+      width: 267,
+      height: 320
+    },
+    thumb: {
+      file_id: 'AAMCAgADHQJnmlUTAAELF0Bod1Gi4aQ79ASONITm5B1CwuIpnQACjDYAAs9c6UqP9nhimA78xQEAB20AAzYE',
+      file_unique_id: 'AQADjDYAAs9c6Upy',
+      file_size: 21125,
+      width: 267,
+      height: 320
+    },
+    file_id: 'CgACAgIAAx0CZ5pVEwABCxdAaHdRouGkO_QEjjSE5uQdQsLiKZ0AAow2AALPXOlKj_Z4YpgO_MU2BA',
+    file_unique_id: 'AgADjDYAAs9c6Uo',
+    file_size: 1337313
+  }
+}
+{
+  message_id: 726849,
+  from: {
+    id: 172359056,
+    is_bot: false,
+    first_name: 'Славный',
+    last_name: 'Малый',
+    username: 'lighterboii',
+    language_code: 'ru'
+  },
+  chat: {
+    id: -1001738167571,
+    title: 'Ультрамегаклёвые челы',
+    type: 'supergroup'
+  },
+  date: 1752650160,
+  text: '@pesdabolbot я пидорас',
+  entities: [ { offset: 0, length: 12, type: 'mention' } ]
+}

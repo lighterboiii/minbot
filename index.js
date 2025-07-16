@@ -54,11 +54,14 @@ const phrases = [
 ];
 
 let botId = null;
+let botUsername = null;
 
-// Получаем ID бота после старта
+// Получаем ID и username бота после старта
 bot.getMe().then((me) => {
   botId = me.id;
+  botUsername = me.username;
   console.log("Bot ID:", botId);
+  console.log("Bot username:", botUsername);
 });
 
 // Ответ на команды типа /start
@@ -80,6 +83,14 @@ bot.on("message", (msg) => {
   const chatId = msg.chat.id;
   console.log(msg);
 
+  // Реакция на упоминание бота через @username (дополнительно, не return)
+  if (msg.text && botUsername && msg.text.toLowerCase().includes("@" + botUsername.toLowerCase())) {
+    let userText = msg.text.replace(new RegExp("@" + botUsername, "ig"), "").trim();
+    const answer = `Сам ты ${userText} братик`;
+    bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
+    // Не return!
+  }
+
   // Игнорировать команды, кроме /start
   if (msg.text && msg.text.startsWith("/") && !msg.text.startsWith("/start"))
     return;
@@ -87,7 +98,7 @@ bot.on("message", (msg) => {
   // Реагируем на ответы на сообщения бота
   if (msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
     const userText = msg.text || "";
-    const answer = `братик что такое "${userText}"`;
+    const answer = `братик "${userText}" не знаю, лучше разравняемся?`;
     bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
     return;
   }
@@ -264,7 +275,6 @@ const periodicPhrases = [
   "Мескалика бы ща",
 ];
 
-// Каждые 20 минут
 cron.schedule("*/37 * * * *", () => {
   const randomPhrase =
     periodicPhrases[Math.floor(Math.random() * periodicPhrases.length)];
