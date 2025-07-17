@@ -11,7 +11,7 @@ const { handlePrognozCommand } = require("./features/prognoz");
 const { handleStickerReaction } = require("./features/stickers");
 const { schedule } = require("node-schedule");
 const cron = require("node-cron");
-const { initRoulette } = require("./roulette");
+const { initRoulette } = require("./features/roulette");
 
 const token = process.env.BOT_TOKEN;
 const bot = new TelegramBot(token, { polling: true });
