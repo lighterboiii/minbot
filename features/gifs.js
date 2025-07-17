@@ -1,5 +1,5 @@
 const fs = require("fs");
-const GIFS_FILE = "gifs.json";
+const GIFS_FILE = "storage/gifs.json";
 
 function saveGifId(fileId) {
   let arr = [];

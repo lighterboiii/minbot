@@ -1,6 +1,6 @@
 const fs = require("fs");
 const photoCaptions = require("../data/photoCaptions");
-const PHOTOS_FILE = "photos.json";
+const PHOTOS_FILE = "storage/photos.json";
 
 function savePhotoId(fileId) {
   let arr = [];

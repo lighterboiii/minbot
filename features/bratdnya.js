@@ -1,7 +1,7 @@
 const fs = require("fs");
 const insultsOfDay = require("../data/insultsOfDay");
-const BRATDNYA_FILE = 'bratdnya.json';
-const USERS_OF_DAY_FILE = 'usersOfDay.json';
+const BRATDNYA_FILE = 'storage/bratdnya.json';
+const USERS_OF_DAY_FILE = 'storage/usersOfDay.json';
 
 function getTodayStr() {
   const now = new Date();

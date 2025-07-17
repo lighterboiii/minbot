@@ -1,5 +1,5 @@
 const fs = require("fs");
-const USERS_OF_DAY_FILE = "usersOfDay.json";
+const USERS_OF_DAY_FILE = "storage/usersOfDay.json";
 
 // Кулдаун в миллисекундах (1 час)
 const DRINKS_COOLDOWN = 60 * 60 * 1000;
