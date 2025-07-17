@@ -25,7 +25,7 @@ function initRoulette(bot, chatIdGetter) {
     rouletteParticipants = new Map();
     bot.sendMessage(
       chatId,
-      "Русская рулетка началась! Пиши /shot или любое сообщение, чтобы участвовать. У вас 1 минута!"
+      "Русская рулетка началась! Тыкай /shot или пиши любое сообщение, чтобы участвовать. У вас 1 минута!"
     );
     // Автоматически добавляем инициатора
     rouletteParticipants.set(msg.from.id, msg.from);

@@ -67,7 +67,7 @@ function handleBotEvents(bot) {
     // Реакция на упоминание бота через @username
     if (!handled && msg.text && botUsername && msg.text.toLowerCase().includes("@" + botUsername.toLowerCase())) {
       let userText = msg.text.replace(new RegExp("@" + botUsername, "ig"), "").trim();
-      const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/photo — пришлю случайную фотку из чата и че нить скажу\n/bratdnya — выберу \"брата дня\"\n/pivko — выберу, кто угощает пивком\n/mezcal — выберу, кто угощает мескаликом\n/photo – отправлю фотку из чата с комментарием`;
+      const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/bratdnya — выберу \"брата дня\"\n/pivko — выберу, кто угощает пивком\n/mezcal — выберу, кто угощает мескаликом\n/photo – отправлю фотку из чата с комментарием`;
       bot.sendMessage(chatId, answer, { reply_to_message_id: msg.message_id });
       handled = true;
       return;

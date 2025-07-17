@@ -7,6 +7,7 @@ const { handleBratdnyaCommand, sendBratDnya, resetBratDnya } = require("./featur
 const { handlePolls } = require("./features/polls");
 const { handleBotEvents } = require("./features/botHandlers");
 const { handleDrinksCommands } = require("./features/drinks");
+const { handlePrognozCommand } = require("./features/prognoz");
 const { schedule } = require("node-schedule");
 const cron = require("node-cron");
 const { initRoulette } = require("./roulette");
@@ -23,6 +24,7 @@ handleBratdnyaCommand(bot, CHANNEL_CHAT_ID);
 handlePolls(bot, CHANNEL_CHAT_ID);
 handleBotEvents(bot);
 handleDrinksCommands(bot);
+handlePrognozCommand(bot);
 initRoulette(bot);
 
 // Автоматические задачи
