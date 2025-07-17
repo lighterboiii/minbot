@@ -20,7 +20,7 @@ const CHANNEL_CHAT_ID = process.env.CHANNEL_CHAT_ID || "YOUR_CHANNEL_CHAT_ID";
 // Основные обработчики команд
 handleWeatherCommand(bot);
 handleNewsCommand(bot);
-handlePhotoCommand(bot);
+// handlePhotoCommand(bot);
 handleBratdnyaCommand(bot, CHANNEL_CHAT_ID);
 handlePolls(bot, CHANNEL_CHAT_ID);
 handleBotEvents(bot);

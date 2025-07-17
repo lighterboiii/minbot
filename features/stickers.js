@@ -24,8 +24,8 @@ function handleStickerReaction(bot) {
     if (msg.sticker && msg.sticker.file_id) {
       saveStickerId(msg.sticker.file_id);
     }
-    // Реакция на сообщение с вероятностью 5%
-    if (msg.text && Math.random() < 0.05) {
+    // Реакция на сообщение%
+    if (msg.text && Math.random() < 0.02) {
       const stickerId = getRandomStickerId();
       if (stickerId) {
         bot.sendSticker(msg.chat.id, stickerId);

@@ -62,9 +62,9 @@ function handlePrognozCommand(bot) {
       if (text) {
         let translated = await translateToRussian(text);
         if (translated) {
-          bot.sendMessage(msg.chat.id, `${mention}, твой гороскоп на сегодня (${sign}): ${translated}`);
+          bot.sendMessage(msg.chat.id, `${mention}, твой гороскоп на сегодня, братик: ${translated}`);
         } else {
-          bot.sendMessage(msg.chat.id, `${mention}, твой гороскоп на сегодня (${sign}): ${text}`);
+          bot.sendMessage(msg.chat.id, `${mention}, твой гороскоп на сегодня, братец: ${text}`);
         }
       } else {
         throw new Error('no horoscope');
