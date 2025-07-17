@@ -1,18 +1,16 @@
 const fs = require("fs");
-const stickerIds = require("../data/stickerIds");
-const STICKERS_FILE = "stickerIds.js";
+const path = require("path");
+const STICKERS_FILE = path.resolve(__dirname, "../data/stickerIds.js");
+let stickerIds = require("../data/stickerIds");
 
 function saveStickerId(fileId) {
-  // Можно хранить в stickerIds.js или отдельном json, пример для json:
-  let arr = [];
-  if (fs.existsSync(STICKERS_FILE)) {
-    try { arr = JSON.parse(fs.readFileSync(STICKERS_FILE, 'utf8')); } catch {}
+  if (!Array.isArray(stickerIds)) stickerIds = [];
+  if (!stickerIds.includes(fileId)) {
+    stickerIds.push(fileId);
+    // Обновляем файл data/stickerIds.js
+    const content = `module.exports = ${JSON.stringify(stickerIds, null, 2)};\n`;
+    fs.writeFileSync(STICKERS_FILE, content, "utf8");
   }
-  if (!arr.includes(fileId)) {
-    arr.push(fileId);
-    fs.writeFileSync(STICKERS_FILE, JSON.stringify(arr));
-  }
-  // Для текущей реализации просто пушим в массив (если нужно — доработать под json)
 }
 
 function getRandomStickerId() {
@@ -21,8 +19,12 @@ function getRandomStickerId() {
 }
 
 function handleStickerReaction(bot) {
-  // Реакция на сообщение с вероятностью 8%
   bot.on('message', (msg) => {
+    // Автоматически сохраняем новые стикеры
+    if (msg.sticker && msg.sticker.file_id) {
+      saveStickerId(msg.sticker.file_id);
+    }
+    // Реакция на сообщение с вероятностью 8%
     if (msg.text && Math.random() < 0.08) {
       const stickerId = getRandomStickerId();
       if (stickerId) {

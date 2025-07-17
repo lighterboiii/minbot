@@ -8,6 +8,7 @@ const { handlePolls } = require("./features/polls");
 const { handleBotEvents } = require("./features/botHandlers");
 const { handleDrinksCommands } = require("./features/drinks");
 const { handlePrognozCommand } = require("./features/prognoz");
+const { handleStickerReaction } = require("./features/stickers");
 const { schedule } = require("node-schedule");
 const cron = require("node-cron");
 const { initRoulette } = require("./roulette");
@@ -25,6 +26,7 @@ handlePolls(bot, CHANNEL_CHAT_ID);
 handleBotEvents(bot);
 handleDrinksCommands(bot);
 handlePrognozCommand(bot);
+handleStickerReaction(bot);
 initRoulette(bot);
 
 // Автоматические задачи
