@@ -4,7 +4,9 @@ const GIFS_FILE = "storage/gifs.json";
 function saveGifId(fileId) {
   let arr = [];
   if (fs.existsSync(GIFS_FILE)) {
-    try { arr = JSON.parse(fs.readFileSync(GIFS_FILE, 'utf8')); } catch {}
+    try {
+      arr = JSON.parse(fs.readFileSync(GIFS_FILE, "utf8"));
+    } catch {}
   }
   if (!arr.includes(fileId)) {
     arr.push(fileId);
@@ -15,18 +17,21 @@ function saveGifId(fileId) {
 function getRandomGifId() {
   if (!fs.existsSync(GIFS_FILE)) return null;
   let arr = [];
-  try { arr = JSON.parse(fs.readFileSync(GIFS_FILE, 'utf8')); } catch {}
+  try {
+    arr = JSON.parse(fs.readFileSync(GIFS_FILE, "utf8"));
+  } catch {}
   if (!arr.length) return null;
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function handleGifReaction(bot) {
-  // Реакция на сообщение с вероятностью 3% (пример, можно доработать)
-  bot.on('message', (msg) => {
+  bot.on("message", (msg) => {
     if (msg.text && Math.random() < 0.03) {
       const gifId = getRandomGifId();
       if (gifId) {
-        bot.sendAnimation(msg.chat.id, gifId, { reply_to_message_id: msg.message_id });
+        bot.sendAnimation(msg.chat.id, gifId, {
+          reply_to_message_id: msg.message_id,
+        });
       }
     }
   });
@@ -35,5 +40,5 @@ function handleGifReaction(bot) {
 module.exports = {
   saveGifId,
   getRandomGifId,
-  handleGifReaction
+  handleGifReaction,
 };

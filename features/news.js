@@ -1,9 +1,8 @@
 const RSSParser = require("rss-parser");
 const rssParser = new RSSParser();
-const { withLock } = require("./lock");
 
 function handleNewsCommand(bot) {
-  bot.onText(/\/news/, withLock(async (msg) => {
+  bot.onText(/\/news/, async (msg) => {
     const chatId = msg.chat.id;
     try {
       const feed = await rssParser.parseURL("https://meduza.io/rss2/all");
@@ -22,7 +21,7 @@ function handleNewsCommand(bot) {
     } catch (e) {
       bot.sendMessage(chatId, "че то новостей нет никаких, братцы");
     }
-  }));
+  });
 }
 
 module.exports = { handleNewsCommand };

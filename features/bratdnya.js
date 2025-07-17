@@ -2,7 +2,6 @@ const fs = require("fs");
 const insultsOfDay = require("../data/insultsOfDay");
 const BRATDNYA_FILE = 'storage/bratdnya.json';
 const USERS_OF_DAY_FILE = 'storage/usersOfDay.json';
-const { withLock } = require("./lock");
 
 function getTodayStr() {
   const now = new Date();
@@ -49,9 +48,9 @@ function sendBratDnya(bot, chatId, forceNew = false) {
 }
 
 function handleBratdnyaCommand(bot, chatId) {
-  bot.onText(/\/bratdnya/, withLock((msg) => {
+  bot.onText(/\/bratdnya/, (msg) => {
     sendBratDnya(bot, msg.chat.id);
-  }));
+  });
 }
 
 module.exports = {

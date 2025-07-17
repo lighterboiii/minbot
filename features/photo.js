@@ -1,8 +1,6 @@
 const fs = require("fs");
 const photoCaptions = require("../data/photoCaptions");
 const PHOTOS_FILE = "storage/photos.json";
-const { sendRandomPhoto } = require("./photo");
-const { withLock } = require("./lock");
 
 function savePhotoId(fileId) {
   let arr = [];
@@ -47,9 +45,9 @@ function sendRandomPhoto(bot, chatId) {
 }
 
 function handlePhotoCommand(bot) {
-  bot.onText(/\/photo/, withLock((msg) => {
+  bot.onText(/\/photo/, (msg) => {
     sendRandomPhoto(bot, msg.chat.id);
-  }));
+  });
 }
 
 function scheduleRandomPhotoCron(bot, chatId) {

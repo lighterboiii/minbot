@@ -2,17 +2,7 @@ let rouletteActive = false;
 let rouletteParticipants = new Map();
 let rouletteTimeout = null;
 
-const insults = [
-  "выгнан позорно!",
-  "отправлен на галеру!",
-  "разравнялся и ушёл!",
-  "был послан нахуй!",
-  "больше не брат!",
-  "отправлен за пивком!",
-  "отправлен за мескаликом",
-  "был изгнан из братвы",
-  "уходит из компании"
-];
+const rouletteShots = require("../data/rouletteShots");
 
 function initRoulette(bot, chatIdGetter) {
   bot.onText(/\/roulette/, (msg) => {
@@ -61,7 +51,7 @@ function finishRoulette(bot, chatId) {
     return;
   }
   const loser = participants[Math.floor(Math.random() * participants.length)];
-  const insult = insults[Math.floor(Math.random() * insults.length)];
+  const insult = rouletteShots[Math.floor(Math.random() * rouletteShots.length)];
   const mention = loser.username
     ? `@${loser.username}`
     : loser.first_name || "братец";

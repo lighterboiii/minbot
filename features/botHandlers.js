@@ -7,7 +7,6 @@ const stickerIds = require("../data/stickerIds");
 const emojis = require("../data/emojis");
 const insults = require("../data/insults");
 const slavaTriggers = require("../data/slavaTriggers");
-const { withLock } = require("./lock");
 
 const SLAVA_ID = 653015244;
 
@@ -21,10 +20,10 @@ function handleBotEvents(bot) {
 
   bot.on(
     "message",
-    withLock((msg) => {
+    (msg) => {
       const chatId = msg.chat.id;
       let handled = false;
-      const lowerCaseText = (msg.text || "").toLowerCase();
+      // const lowerCaseText = (msg.text || "").toLowerCase();
 
       // 1. Reply на сообщение бота
       if (
@@ -97,7 +96,7 @@ function handleBotEvents(bot) {
         let userText = msg.text
           .replace(new RegExp("@" + botUsername, "ig"), "")
           .trim();
-        const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/bratdnya — выберу \"брата дня\"\n/pivko — выберу, кто угощает пивком\n/mezcal — выберу, кто угощает мескаликом\n/photo – отправлю фотку из чата с комментарием`;
+        const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/bratdnya — выберу \"брата дня\"\n/pivko — выберу, кто угощает пивком\n/mezcal — выберу, кто угощает мескаликом\n/photo – отправлю фотку из чата с комментарием (заблокировал ибо вы заспамили чат)\n/prognoz – что то наговорю вам`;
         bot.sendMessage(chatId, answer, {
           reply_to_message_id: msg.message_id,
         });
@@ -154,7 +153,7 @@ function handleBotEvents(bot) {
       if (msg.from && msg.from.id) {
         saveUserOfDay(msg.from);
       }
-    })
+    }
   );
 }
 

@@ -1,6 +1,5 @@
 const fs = require("fs");
 const USERS_OF_DAY_FILE = "storage/usersOfDay.json";
-const { withLock } = require("./lock");
 
 // Кулдаун в миллисекундах (1 час)
 const DRINKS_COOLDOWN = 60 * 60 * 1000;
@@ -14,7 +13,7 @@ function formatTime(ms) {
 }
 
 function handleDrinksCommands(bot) {
-  bot.onText(/\/pivko/, withLock((msg) => {
+  bot.onText(/\/pivko/, (msg) => {
     const chatId = msg.chat.id;
     const now = Date.now();
     const key = `${chatId}_pivko`;
@@ -37,9 +36,9 @@ function handleDrinksCommands(bot) {
       : user.first_name || "братец";
     const text = `Чек за пивко сегодня на ${mention}, сегодня твоя очередь разравнивать корешей!`;
     bot.sendMessage(chatId, text);
-  }));
+  });
 
-  bot.onText(/\/mezcal/, withLock((msg) => {
+  bot.onText(/\/mezcal/, (msg) => {
     const chatId = msg.chat.id;
     const now = Date.now();
     const key = `${chatId}_mezcal`;
@@ -62,7 +61,7 @@ function handleDrinksCommands(bot) {
       : user.first_name || "братец";
     const text = `Чек за мескалик сегодня на ${mention}, сегодня твоя очередь угощать братцев!`;
     bot.sendMessage(chatId, text);
-  }));
+  });
 }
 
 module.exports = { handleDrinksCommands }; 
