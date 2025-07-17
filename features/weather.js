@@ -1,7 +1,8 @@
 const axios = require("axios");
+const { withLock } = require("./lock");
 
 function handleWeatherCommand(bot) {
-  bot.onText(/\/weather/, async (msg) => {
+  bot.onText(/\/weather/, withLock(async (msg) => {
     const chatId = msg.chat.id;
     const apiKey = process.env.OWM_API_KEY || "";
     const cities = [
@@ -25,7 +26,7 @@ function handleWeatherCommand(bot) {
       }
     }
     bot.sendMessage(chatId, reply, { parse_mode: "HTML" });
-  });
+  }));
 }
 
 module.exports = { handleWeatherCommand };

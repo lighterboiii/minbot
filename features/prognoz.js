@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { withLock } = require("./lock");
 
 const ZODIAC_SIGNS = [
   "aries", "taurus", "gemini", "cancer", "leo", "virgo",
@@ -44,7 +45,7 @@ async function translateToRussian(text) {
 }
 
 function handlePrognozCommand(bot) {
-  bot.onText(/\/prognoz(?:\s+(\S+))?/, async (msg, match) => {
+  bot.onText(/\/prognoz(?:\s+(\S+))?/, withLock(async (msg, match) => {
     const user = msg.from;
     const mention = user.username ? `@${user.username}` : user.first_name || 'братец';
     let sign = match[1] ? match[1].toLowerCase() : getRandomSign();
@@ -73,7 +74,7 @@ function handlePrognozCommand(bot) {
       const phrase = HOROSCOPE_PHRASES[Math.floor(Math.random() * HOROSCOPE_PHRASES.length)];
       bot.sendMessage(msg.chat.id, `${mention}, твой шуточный прогноз: ${phrase}`);
     }
-  });
+  }));
 }
 
 module.exports = { handlePrognozCommand }; 
