@@ -50,18 +50,18 @@ function handlePhotoCommand(bot) {
   });
 }
 
-// function scheduleRandomPhotoCron(bot, chatId) {
-//   const cron = require("node-cron");
-//   if (global.photoCronJob) global.photoCronJob.stop();
-//   const minutes = Math.floor(Math.random() * 60) + 480 / 3; // 160-219 минут
-//   global.photoCronJob = cron.schedule(
-//     `*/${Math.floor(minutes)} * * * *`,
-//     () => {
-//       sendRandomPhoto(bot, chatId);
-//       scheduleRandomPhotoCron(bot, chatId);
-//     }
-//   );
-// }
+function scheduleRandomPhotoCron(bot, chatId) {
+  const cron = require("node-cron");
+  if (global.photoCronJob) global.photoCronJob.stop();
+  const minutes = Math.floor(Math.random() * 60) + 480 / 3;
+  global.photoCronJob = cron.schedule(
+    `*/${Math.floor(minutes)} * * * *`,
+    () => {
+      sendRandomPhoto(bot, chatId);
+      scheduleRandomPhotoCron(bot, chatId);
+    }
+  );
+}
 
 module.exports = {
   handlePhotoCommand,
