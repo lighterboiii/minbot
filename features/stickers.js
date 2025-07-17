@@ -1,5 +1,5 @@
 const fs = require("fs");
-const stickerIds = require("../stickerIds");
+const stickerIds = require("../data/stickerIds");
 const STICKERS_FILE = "stickerIds.js";
 
 function saveStickerId(fileId) {

@@ -2,11 +2,11 @@ const { saveUserOfDay } = require("./utils");
 const { savePhotoId } = require("./photo");
 const { saveStickerId } = require("./stickers");
 const { saveGifId, getRandomGifId } = require("./gifs");
-const phrases = require("../phrases");
-const stickerIds = require("../stickerIds");
-const emojis = require("../emojis");
-const insults = require("../insults");
-const slavaTriggers = require("../slavaTriggers");
+const phrases = require("../data/phrases");
+const stickerIds = require("../data/stickerIds");
+const emojis = require("../data/emojis");
+const insults = require("../data/insults");
+const slavaTriggers = require("../data/slavaTriggers");
 
 const SLAVA_ID = 653015244;
 
