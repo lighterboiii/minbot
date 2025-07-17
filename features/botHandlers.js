@@ -52,7 +52,7 @@ function handleBotEvents(bot) {
       msg.from.id === SLAVA_ID
       // && slavaTriggers.some(trigger => lowerCaseText.includes(trigger))
     ) {
-      if (Math.random() < 0.2) {
+      if (Math.random() < 0.03) {
         const randomInsult =
           insults[Math.floor(Math.random() * insults.length)];
         bot.sendMessage(chatId, randomInsult, {
