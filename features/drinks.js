@@ -20,7 +20,7 @@ function handleDrinksCommands(bot) {
     const last = global.drinksCooldowns[key] || 0;
     if (now - last < DRINKS_COOLDOWN) {
       const wait = DRINKS_COOLDOWN - (now - last);
-      bot.sendMessage(chatId, `Чек за пивко недавно уже был!`);
+      bot.sendMessage(chatId, `Чек за пивко недавно уже был! ${formatTime(wait)}`);
       return;
     }
     global.drinksCooldowns[key] = now;
@@ -45,7 +45,7 @@ function handleDrinksCommands(bot) {
     const last = global.drinksCooldowns[key] || 0;
     if (now - last < DRINKS_COOLDOWN) {
       const wait = DRINKS_COOLDOWN - (now - last);
-      bot.sendMessage(chatId, `Чек за мескалик недавно уже был!`);
+      bot.sendMessage(chatId, `Чек за мескалик недавно уже был! ${formatTime(wait)}`);
       return;
     }
     global.drinksCooldowns[key] = now;
