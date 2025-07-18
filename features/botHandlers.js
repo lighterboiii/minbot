@@ -6,13 +6,13 @@ const phrases = require("../data/phrases");
 const stickerIds = require("../data/stickerIds");
 const emojis = require("../data/emojis");
 const insults = require("../data/insults");
-const slavaTriggers = require("../data/slavaTriggers");
 
 const SLAVA_ID = 653015244;
 
 function handleBotEvents(bot) {
   let botId = null;
   let botUsername = null;
+  const botStartTime = Math.floor(Date.now() / 1000); // время запуска бота
   bot.getMe().then((me) => {
     botId = me.id;
     botUsername = me.username;
@@ -21,9 +21,10 @@ function handleBotEvents(bot) {
   bot.on(
     "message",
     (msg) => {
+      // Игнорировать сообщения, отправленные до запуска бота
+      if (msg.date < botStartTime) return;
       const chatId = msg.chat.id;
       let handled = false;
-      // const lowerCaseText = (msg.text || "").toLowerCase();
 
       // 1. Reply на сообщение бота
       if (
@@ -40,12 +41,8 @@ function handleBotEvents(bot) {
         return;
       }
 
-      // Персональная реакция на Славу
-      if (
-        !handled &&
-        msg.from.id === SLAVA_ID
-        // && slavaTriggers.some(trigger => lowerCaseText.includes(trigger))
-      ) {
+      // Персональная реакция с оскорблением
+      if (!handled && msg.from.id === SLAVA_ID) {
         if (Math.random() < 0.03) {
           const randomInsult =
             insults[Math.floor(Math.random() * insults.length)];
