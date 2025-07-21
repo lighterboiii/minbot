@@ -45,7 +45,9 @@ function sendRandomPhoto(bot, chatId) {
 }
 
 function handlePhotoCommand(bot) {
+  const botStartTime = Math.floor(Date.now() / 1000);
   bot.onText(/\/photo/, (msg) => {
+    if (msg.date < botStartTime - 10) return;
     sendRandomPhoto(bot, msg.chat.id);
   });
 }

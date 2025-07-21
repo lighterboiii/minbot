@@ -21,8 +21,8 @@ function handleBotEvents(bot) {
   bot.on(
     "message",
     (msg) => {
-      // Игнорировать сообщения, отправленные до запуска бота
-      if (msg.date < botStartTime) return;
+      // Игнорировать сообщения, отправленные до запуска бота (с запасом 10 сек)
+      if (msg.date < botStartTime - 10) return;
       const chatId = msg.chat.id;
       let handled = false;
 

@@ -61,9 +61,9 @@ function finishRoulette(bot, chatId) {
       disable_notification: true,
     });
   });
-  setTimeout(() => {
-    bot.sendMessage(chatId, "Остальные выжили!");
-  }, 100);
+  // setTimeout(() => {
+  //   bot.sendMessage(chatId, "Остальные выжили!");
+  // }, 100);
 }
 
 module.exports = { initRoulette };

@@ -13,7 +13,9 @@ function formatTime(ms) {
 }
 
 function handleDrinksCommands(bot) {
+  const botStartTime = Math.floor(Date.now() / 1000);
   bot.onText(/\/pivko/, (msg) => {
+    if (msg.date < botStartTime - 10) return;
     const chatId = msg.chat.id;
     const now = Date.now();
     const key = `${chatId}_pivko`;
@@ -39,6 +41,7 @@ function handleDrinksCommands(bot) {
   });
 
   bot.onText(/\/mezcal/, (msg) => {
+    if (msg.date < botStartTime - 10) return;
     const chatId = msg.chat.id;
     const now = Date.now();
     const key = `${chatId}_mezcal`;

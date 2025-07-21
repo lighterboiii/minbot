@@ -1,13 +1,16 @@
 const axios = require("axios");
 
 function handleWeatherCommand(bot) {
+  const botStartTime = Math.floor(Date.now() / 1000);
   bot.onText(/\/weather/, async (msg) => {
+    if (msg.date < botStartTime - 10) return;
     const chatId = msg.chat.id;
     const apiKey = process.env.OWM_API_KEY || "";
     const cities = [
       { name: "Москва", query: "Moscow" },
       { name: "Мценск", query: "Mtsensk" },
       { name: "Санкт-Петербург", query: "Saint Petersburg" },
+      { name: "Воронеж", query: "Voronezh" },
     ];
     let reply = "";
     for (const city of cities) {

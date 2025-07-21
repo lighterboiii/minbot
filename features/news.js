@@ -2,7 +2,9 @@ const RSSParser = require("rss-parser");
 const rssParser = new RSSParser();
 
 function handleNewsCommand(bot) {
+  const botStartTime = Math.floor(Date.now() / 1000);
   bot.onText(/\/news/, async (msg) => {
+    if (msg.date < botStartTime - 10) return;
     const chatId = msg.chat.id;
     try {
       const feed = await rssParser.parseURL("https://meduza.io/rss2/all");
