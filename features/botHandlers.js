@@ -6,8 +6,87 @@ const phrases = require("../data/phrases");
 const stickerIds = require("../data/stickerIds");
 const emojis = require("../data/emojis");
 const insults = require("../data/insults");
+const fs = require('fs');
+const path = require('path');
 
 const SLAVA_ID = 653015244;
+const ROUNDS_PATH = path.join(__dirname, '../storage/rounds.json');
+const TARGET_USER_ID = 123456789; // заглушка user_id
+
+function saveRound(fileId) {
+  let rounds = [];
+  if (fs.existsSync(ROUNDS_PATH)) {
+    rounds = JSON.parse(fs.readFileSync(ROUNDS_PATH, 'utf8'));
+  }
+  if (!rounds.includes(fileId)) {
+    rounds.push(fileId);
+    fs.writeFileSync(ROUNDS_PATH, JSON.stringify(rounds, null, 2));
+  }
+}
+
+function getRandomRoundId() {
+  if (!fs.existsSync(ROUNDS_PATH)) return null;
+  let rounds = [];
+  try {
+    rounds = JSON.parse(fs.readFileSync(ROUNDS_PATH, 'utf8'));
+  } catch {}
+  if (!rounds.length) return null;
+  return rounds[Math.floor(Math.random() * rounds.length)];
+}
+
+function randomReaction(bot, chatId, replyToMessageId = null) {
+  const options = [];
+  if (phrases.length) options.push('phrase');
+  if (stickerIds.length) options.push('sticker');
+  if (typeof getRandomGifId === 'function' && getRandomGifId()) options.push('gif');
+  // Проверяем, есть ли фотки
+  let photos = [];
+  try {
+    photos = JSON.parse(fs.readFileSync(path.join(__dirname, '../storage/photos.json'), 'utf8'));
+  } catch {}
+  if (photos.length) options.push('photo');
+  // Проверяем, есть ли кружки
+  let rounds = [];
+  try {
+    rounds = JSON.parse(fs.readFileSync(ROUNDS_PATH, 'utf8'));
+  } catch {}
+  if (rounds.length) options.push('round');
+
+  if (!options.length) return;
+  const pick = options[Math.floor(Math.random() * options.length)];
+  const sendOpts = replyToMessageId ? { reply_to_message_id: replyToMessageId } : {};
+  switch (pick) {
+    case 'phrase':
+      bot.sendMessage(chatId, phrases[Math.floor(Math.random() * phrases.length)], sendOpts);
+      break;
+    case 'sticker':
+      bot.sendSticker(chatId, stickerIds[Math.floor(Math.random() * stickerIds.length)], sendOpts);
+      break;
+    case 'gif': {
+      const gifId = getRandomGifId();
+      if (gifId) bot.sendAnimation(chatId, gifId, sendOpts);
+      break;
+    }
+    case 'photo': {
+      const fileId = photos[Math.floor(Math.random() * photos.length)];
+      bot.sendPhoto(chatId, fileId, sendOpts);
+      break;
+    }
+    case 'round': {
+      const roundId = rounds[Math.floor(Math.random() * rounds.length)];
+      bot.sendVideoNote(chatId, roundId, sendOpts);
+      break;
+    }
+  }
+}
+
+function randomReactionToChat(bot, chatId) {
+  randomReaction(bot, chatId);
+}
+
+function randomReactionToMessage(bot, chatId, messageId) {
+  randomReaction(bot, chatId, messageId);
+}
 
 function handleBotEvents(bot) {
   let botId = null;
@@ -27,13 +106,9 @@ function handleBotEvents(bot) {
       let handled = false;
 
       // 1. Reply на сообщение бота
-      if (
-        !handled &&
-        msg.reply_to_message &&
-        botId &&
-        msg.reply_to_message.from.id === botId
+      if (!handled && msg.reply_to_message && botId && msg.reply_to_message.from.id === botId
       ) {
-        const randomInsult = insults[Math.floor(Math.random() * insults.length)];
+        const randomInsult = phrases[Math.floor(Math.random() * phrases.length)];
         bot.sendMessage(chatId, randomInsult, {
           reply_to_message_id: msg.message_id,
         });
@@ -42,17 +117,17 @@ function handleBotEvents(bot) {
       }
 
       // Персональная реакция с оскорблением
-      if (!handled && msg.from.id === SLAVA_ID) {
-        if (Math.random() < 0.03) {
-          const randomInsult =
-            insults[Math.floor(Math.random() * insults.length)];
-          bot.sendMessage(chatId, randomInsult, {
-            reply_to_message_id: msg.message_id,
-          });
-        }
-        handled = true;
-        return;
-      }
+      // if (!handled && msg.from.id === SLAVA_ID) {
+      //   if (Math.random() < 0.03) {
+      //     const randomInsult =
+      //       insults[Math.floor(Math.random() * insults.length)];
+      //     bot.sendMessage(chatId, randomInsult, {
+      //       reply_to_message_id: msg.message_id,
+      //     });
+      //   }
+      //   handled = true;
+      //   return;
+      // }
 
       if (
         !handled &&
@@ -93,55 +168,10 @@ function handleBotEvents(bot) {
         let userText = msg.text
           .replace(new RegExp("@" + botUsername, "ig"), "")
           .trim();
-        const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/bratdnya — выберу \"брата дня\"\n/pivko — выберу, кто угощает пивком\n/mezcal — выберу, кто угощает мескаликом\n/photo – отправлю фотку из чата с комментарием (заблокировал ибо вы заспамили чат)\n/prognoz – что то наговорю вам`;
+        const answer = `Сам ты ${userText} братик\n\nЯ вот что могу:\n/weather — покажу погоду\n/news — пришлю подборку свежих новостей\n/bratdnya — выберу \"брата дня\"\n/pivko — выберу, кто угощает пивком\n/mezcal — выберу, кто угощает мескаликом\n/prognoz – что то наговорю вам`;
         bot.sendMessage(chatId, answer, {
           reply_to_message_id: msg.message_id,
         });
-        handled = true;
-        return;
-      }
-
-      // Игнорировать команды, кроме /start
-      if (
-        !handled &&
-        msg.text &&
-        msg.text.startsWith("/") &&
-        !msg.text.startsWith("/start")
-      ) {
-        handled = true;
-        return;
-      }
-
-      // С вероятностью 3% отправляем гифку, иначе обычную реакцию
-      if (!handled && Math.random() < 0.014) {
-        const gifId = getRandomGifId();
-        if (gifId) {
-          bot.sendAnimation(msg.chat.id, gifId, {
-            reply_to_message_id: msg.message_id,
-          });
-          handled = true;
-          return;
-        }
-        // Если гифок нет — обычная реакция
-        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-        bot.sendMessage(msg.chat.id, randomEmoji, {
-          reply_to_message_id: msg.message_id,
-        });
-        handled = true;
-        return;
-      }
-
-      // С вероятностью 8% отвечаем фразой или стикером
-      if (!handled && Math.random() < 0.04) {
-        if (Math.random() < 0.2) {
-          const randomSticker =
-            stickerIds[Math.floor(Math.random() * stickerIds.length)];
-          bot.sendSticker(chatId, randomSticker);
-        } else {
-          const randomPhrase =
-            phrases[Math.floor(Math.random() * phrases.length)];
-          bot.sendMessage(chatId, randomPhrase);
-        }
         handled = true;
         return;
       }
@@ -150,8 +180,32 @@ function handleBotEvents(bot) {
       if (msg.from && msg.from.id) {
         saveUserOfDay(msg.from);
       }
+
+      // Рандомная реакция: либо reply, либо просто в чат, с вероятностью 8%
+      if (
+        !handled &&
+        msg.from &&
+        botId &&
+        msg.from.id !== botId &&
+        !(msg.text && msg.text.startsWith('/')) &&
+        Math.random() < 0.08
+      ) {
+        if (Math.random() < 0.5) {
+          randomReactionToMessage(bot, chatId, msg.message_id);
+        } else {
+          randomReactionToChat(bot, chatId);
+        }
+        handled = true;
+        return;
+      }
     }
   );
+
+  bot.on('video_note', (msg) => {
+    if (msg.from && msg.from.id === TARGET_USER_ID && msg.video_note && msg.video_note.file_id) {
+      saveRound(msg.video_note.file_id);
+    }
+  });
 }
 
-module.exports = { handleBotEvents };
+module.exports = { handleBotEvents, randomReactionToChat, randomReactionToMessage };
