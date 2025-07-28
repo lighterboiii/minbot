@@ -79,12 +79,15 @@ function handleBotEvents(bot) {
       let handled = false;
 
       // 1. Reply на сообщение бота
-      if (!handled && msg.reply_to_message && botId && msg.reply_to_message.from.id === botId
-      ) {
-        const randomInsult = phrases[Math.floor(Math.random() * phrases.length)];
-        bot.sendMessage(chatId, randomInsult, {
-          reply_to_message_id: msg.message_id,
-        });
+      if (!handled && msg.reply_to_message && botId && msg.reply_to_message.from.id === botId) {
+        // 2% шанс отправить кружок, иначе фраза
+        if (Math.random() < 0.02) {
+          const roundId = getRandomRoundId();
+          if (roundId) bot.sendVideoNote(chatId, roundId, { reply_to_message_id: msg.message_id });
+        } else {
+          const phrase = getRandomPhrase();
+          if (phrase) bot.sendMessage(chatId, phrase, { reply_to_message_id: msg.message_id });
+        }
         handled = true;
         return;
       }
