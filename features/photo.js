@@ -65,10 +65,21 @@ function scheduleRandomPhotoCron(bot, chatId) {
   );
 }
 
+function getRandomPhotoId() {
+  if (!fs.existsSync(PHOTOS_FILE)) return null;
+  let arr = [];
+  try {
+    arr = JSON.parse(fs.readFileSync(PHOTOS_FILE, "utf8"));
+  } catch {}
+  if (!arr.length) return null;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 module.exports = {
   handlePhotoCommand,
   sendRandomPhoto,
   savePhotoId,
   scheduleRandomPhotoCron,
-  canSendAuto
+  canSendAuto,
+  getRandomPhotoId
 };

@@ -2,66 +2,52 @@ const { saveUserOfDay } = require("./utils");
 const { savePhotoId } = require("./photo");
 const { saveStickerId } = require("./stickers");
 const { saveGifId, getRandomGifId } = require("./gifs");
+const { saveRound, getRandomRoundId } = require("./rounds");
 const phrases = require("../data/phrases");
-const stickerIds = require("../data/stickerIds");
-const fs = require('fs');
-const path = require('path');
+const { getRandomPhotoId } = require("./photo");
+const { getRandomStickerId } = require("./stickers");
 
-const ROUNDS_PATH = path.join(__dirname, '../storage/rounds.json');
 const TARGET_USER_ID = 168853874;
 
-function saveRound(fileId) {
-  let rounds = [];
-  if (fs.existsSync(ROUNDS_PATH)) {
-    rounds = JSON.parse(fs.readFileSync(ROUNDS_PATH, 'utf8'));
-  }
-  if (!rounds.includes(fileId)) {
-    rounds.push(fileId);
-    fs.writeFileSync(ROUNDS_PATH, JSON.stringify(rounds, null, 2));
-  }
+function getRandomPhrase() {
+  if (!Array.isArray(phrases) || !phrases.length) return null;
+  return phrases[Math.floor(Math.random() * phrases.length)];
 }
-
 function randomReaction(bot, chatId, replyToMessageId = null) {
   const options = [];
-  if (phrases.length) options.push('phrase');
-  if (stickerIds.length) options.push('sticker');
+  if (getRandomPhrase()) options.push('phrase');
+  if (getRandomStickerId()) options.push('sticker');
   if (typeof getRandomGifId === 'function' && getRandomGifId()) options.push('gif');
-  // Проверяем, есть ли фотки
-  let photos = [];
-  try {
-    photos = JSON.parse(fs.readFileSync(path.join(__dirname, '../storage/photos.json'), 'utf8'));
-  } catch {}
-  if (photos.length) options.push('photo');
-  // Проверяем, есть ли кружки
-  let rounds = [];
-  try {
-    rounds = JSON.parse(fs.readFileSync(ROUNDS_PATH, 'utf8'));
-  } catch {}
-  if (rounds.length) options.push('round');
+  if (getRandomPhotoId()) options.push('photo');
+  if (getRandomRoundId()) options.push('round');
 
   if (!options.length) return;
   const pick = options[Math.floor(Math.random() * options.length)];
   const sendOpts = replyToMessageId ? { reply_to_message_id: replyToMessageId } : {};
   switch (pick) {
-    case 'phrase':
-      bot.sendMessage(chatId, phrases[Math.floor(Math.random() * phrases.length)], sendOpts);
+    case 'phrase': {
+      const phrase = getRandomPhrase();
+      if (phrase) bot.sendMessage(chatId, phrase, sendOpts);
       break;
-    case 'sticker':
-      bot.sendSticker(chatId, stickerIds[Math.floor(Math.random() * stickerIds.length)], sendOpts);
+    }
+    case 'sticker': {
+      const stickerId = getRandomStickerId();
+      if (stickerId) bot.sendSticker(chatId, stickerId, sendOpts);
       break;
+    }
     case 'gif': {
       const gifId = getRandomGifId();
       if (gifId) bot.sendAnimation(chatId, gifId, sendOpts);
       break;
     }
     case 'photo': {
-      const fileId = photos[Math.floor(Math.random() * photos.length)];
-      bot.sendPhoto(chatId, fileId, sendOpts);
+      const fileId = getRandomPhotoId();
+      if (fileId) bot.sendPhoto(chatId, fileId, sendOpts);
       break;
     }
     case 'round': {
-      const roundId = rounds[Math.floor(Math.random() * rounds.length)];
-      bot.sendVideoNote(chatId, roundId, sendOpts);
+      const roundId = getRandomRoundId();
+      if (roundId) bot.sendVideoNote(chatId, roundId, sendOpts);
       break;
     }
   }
