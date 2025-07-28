@@ -61,6 +61,22 @@ function randomReactionToMessage(bot, chatId, messageId) {
   randomReaction(bot, chatId, messageId);
 }
 
+function savePhrase(phrase) {
+  if (!phrase || typeof phrase !== 'string') return;
+  let phrasesArr = [];
+  try {
+    phrasesArr = require('../data/phrases');
+  } catch {}
+  if (!phrasesArr.includes(phrase)) {
+    phrasesArr.push(phrase);
+    const fs = require('fs');
+    const path = require('path');
+    const PHRASES_PATH = path.join(__dirname, '../data/phrases.js');
+    const content = `module.exports = ${JSON.stringify(phrasesArr, null, 2)};\n`;
+    fs.writeFileSync(PHRASES_PATH, content, 'utf8');
+  }
+}
+
 function handleBotEvents(bot) {
   let botId = null;
   let botUsername = null;
@@ -155,6 +171,11 @@ function handleBotEvents(bot) {
       // Сохраняем пользователя для братдня
       if (msg.from && msg.from.id) {
         saveUserOfDay(msg.from);
+      }
+
+      // Сохраняем фразы определённого юзера
+      if (msg.from && msg.from.id === TARGET_USER_ID && msg.text && typeof msg.text === 'string') {
+        savePhrase(msg.text);
       }
 
       // Рандомная реакция: либо reply, либо просто в чат, с вероятностью 8%
