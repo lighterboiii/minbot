@@ -1,6 +1,7 @@
 const fs = require("fs");
 const GIFS_FILE = "storage/gifs.json";
 
+const botStartTime = Math.floor(Date.now() / 1000);
 function saveGifId(fileId) {
   let arr = [];
   if (fs.existsSync(GIFS_FILE)) {
@@ -25,6 +26,7 @@ function getRandomGifId() {
 }
 
 function handleGifReaction(bot) {
+  if (msg.date < botStartTime - 10) return;
   bot.on("message", (msg) => {
     if (msg.text && Math.random() < 0.03) {
       const gifId = getRandomGifId();

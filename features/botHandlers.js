@@ -4,14 +4,11 @@ const { saveStickerId } = require("./stickers");
 const { saveGifId, getRandomGifId } = require("./gifs");
 const phrases = require("../data/phrases");
 const stickerIds = require("../data/stickerIds");
-const emojis = require("../data/emojis");
-const insults = require("../data/insults");
 const fs = require('fs');
 const path = require('path');
 
-const SLAVA_ID = 653015244;
 const ROUNDS_PATH = path.join(__dirname, '../storage/rounds.json');
-const TARGET_USER_ID = 123456789; // заглушка user_id
+const TARGET_USER_ID = 168853874;
 
 function saveRound(fileId) {
   let rounds = [];
@@ -22,16 +19,6 @@ function saveRound(fileId) {
     rounds.push(fileId);
     fs.writeFileSync(ROUNDS_PATH, JSON.stringify(rounds, null, 2));
   }
-}
-
-function getRandomRoundId() {
-  if (!fs.existsSync(ROUNDS_PATH)) return null;
-  let rounds = [];
-  try {
-    rounds = JSON.parse(fs.readFileSync(ROUNDS_PATH, 'utf8'));
-  } catch {}
-  if (!rounds.length) return null;
-  return rounds[Math.floor(Math.random() * rounds.length)];
 }
 
 function randomReaction(bot, chatId, replyToMessageId = null) {

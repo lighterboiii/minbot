@@ -39,7 +39,6 @@ function schedulePollsForToday(bot, chatId) {
 }
 
 function handlePolls(bot, chatId) {
-  const botStartTime = Math.floor(Date.now() / 1000);
   schedule.scheduleJob({ hour: 0, minute: 0 }, () => schedulePollsForToday(bot, chatId));
   schedulePollsForToday(bot, chatId);
 }

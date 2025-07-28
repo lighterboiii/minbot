@@ -35,10 +35,10 @@ scheduleRandomPhotoCron(bot, CHANNEL_CHAT_ID); // Автофотки
 
 // Пример: приветствие утром
 cron.schedule("0 7 * * *", () => {
-  bot.sendMessage(CHANNEL_CHAT_ID, "Здарова, Мужики");
+  bot.sendMessage(CHANNEL_CHAT_ID, "Доброе утро мужики");
 });
 
 // Пример: сообщение на ночь
 cron.schedule("0 22 * * *", () => {
-  bot.sendMessage(CHANNEL_CHAT_ID, "Спать пора, братишки. Давайте не заебывайте.");
+  bot.sendMessage(CHANNEL_CHAT_ID, "Спать пора братики. Давайте не заебывайте.");
 });
