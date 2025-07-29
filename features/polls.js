@@ -1,4 +1,4 @@
-const pollQuestions = require("../data/pollQuestions");
+const pollQuestions = require("../storage/pollQuestions");
 const schedule = require("node-schedule");
 
 let pollJobs = [];

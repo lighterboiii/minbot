@@ -3,7 +3,7 @@ const { savePhotoId } = require("./photo");
 const { saveStickerId } = require("./stickers");
 const { saveGifId, getRandomGifId } = require("./gifs");
 const { saveRound, getRandomRoundId } = require("./rounds");
-const phrases = require("../data/phrases");
+const phrases = require("../storage/phrases");
 const { getRandomPhotoId } = require("./photo");
 const { getRandomStickerId } = require("./stickers");
 
@@ -65,13 +65,13 @@ function savePhrase(phrase) {
   if (!phrase || typeof phrase !== 'string') return;
   let phrasesArr = [];
   try {
-    phrasesArr = require('../data/phrases');
+    phrasesArr = require('../storage/phrases');
   } catch {}
   if (!phrasesArr.includes(phrase)) {
     phrasesArr.push(phrase);
     const fs = require('fs');
     const path = require('path');
-    const PHRASES_PATH = path.join(__dirname, '../data/phrases.js');
+    const PHRASES_PATH = path.join(__dirname, '../storage/phrases.js');
     const content = `module.exports = ${JSON.stringify(phrasesArr, null, 2)};\n`;
     fs.writeFileSync(PHRASES_PATH, content, 'utf8');
   }

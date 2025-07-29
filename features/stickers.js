@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-const STICKERS_FILE = path.resolve(__dirname, "../data/stickerIds.js");
-let stickerIds = require("../data/stickerIds");
+const STICKERS_FILE = path.resolve(__dirname, "../storage/stickerIds.js");
+let stickerIds = require("../storage/stickerIds");
 
 function saveStickerId(fileId) {
   if (!Array.isArray(stickerIds)) stickerIds = [];

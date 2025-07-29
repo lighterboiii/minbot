@@ -1,4 +1,4 @@
-const HOROSCOPE_PHRASES = require("../data/horoscopeFrases");
+const HOROSCOPE_PHRASES = require("../storage/horoscopeFrases");
 
 function handlePrognozCommand(bot) {
   const botStartTime = Math.floor(Date.now() / 1000);

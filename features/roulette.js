@@ -2,7 +2,7 @@ let rouletteActive = false;
 let rouletteParticipants = new Map();
 let rouletteTimeout = null;
 
-const rouletteShots = require("../data/rouletteShots");
+const rouletteShots = require("../storage/rouletteShots");
 
 function initRoulette(bot, chatIdGetter) {
   bot.onText(/\/roulette/, (msg) => {

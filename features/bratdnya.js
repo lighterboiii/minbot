@@ -1,5 +1,5 @@
 const fs = require("fs");
-const insultsOfDay = require("../data/insultsOfDay");
+const insultsOfDay = require("../storage/insultsOfDay");
 const BRATDNYA_FILE = 'storage/bratdnya.json';
 const USERS_OF_DAY_FILE = 'storage/usersOfDay.json';
 

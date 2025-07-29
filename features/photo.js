@@ -1,5 +1,5 @@
 const fs = require("fs");
-const photoCaptions = require("../data/photoCaptions");
+const photoCaptions = require("../storage/photoCaptions");
 const PHOTOS_FILE = "storage/photos.json";
 
 function savePhotoId(fileId) {
